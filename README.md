@@ -182,7 +182,7 @@ python3 src/main.py
 
 ---
 
-## 📚 Conteúdo Matemático
+##  Conteúdo Matemático
 
 O Function Archer foi desenvolvido para trabalhar quatro conteúdos fundamentais da disciplina de Cálculo Diferencial e Integral (CDI).
 
@@ -231,7 +231,7 @@ A proposta é utilizar a visualização gráfica para facilitar a compreensão d
 
 ---
 
-## 🤖 Documentação de Uso de Inteligência Artificial
+##  Documentação de Uso de Inteligência Artificial
 
 Durante o desenvolvimento do Function Archer, foram utilizadas ferramentas de Inteligência Artificial como apoio ao processo de programação, organização e documentação do projeto.
 
