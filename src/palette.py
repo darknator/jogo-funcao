@@ -25,6 +25,9 @@ PALETTE = {
     'B': (106, 76, 147),
 }
 
-CHAPTER_NAMES = ["Constante", "A Reta", "A Curva", "Crescimento", "Desacel.", "Aproxim.", "Tangente", "Area"]
+CHAPTER_NAMES = [
+    "Constante", "Reta", "Parábola", "Exponencial",
+    "Logaritmo", "Limites", "Derivadas", "Integrais"
+]
 CHAPTER_COLORS = [(150,150,160), (69,123,157), (90,143,95), (231,111,81), (106,76,147), (200,90,120), (60,160,170), (210,160,40)]
 BOW_LEVELS = [{'color': (139, 69, 19)}, {'color': (230, 220, 190)}, {'color': (180, 180, 195)}, {'color': (255, 200, 30)}, {'color': (150, 80, 220)}]
