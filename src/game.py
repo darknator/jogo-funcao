@@ -17,11 +17,12 @@ PHASES = [
     }
 ]
 
+
 KEYS = [
-    ['7', '8', '9', '+', 'C'],
-    ['4', '5', '6', '-', '<'],
-    ['1', '2', '3', '*', 'x'],
-    ['0', '.', '^', '/', '=']
+    ['7', '8', '9', '^', 'C'],
+    ['4', '5', '6', '*', '<'],
+    ['1', '2', '3', '-', 'x'],
+    ['0', '.', '+', '/', '=']
 ]
 
 
@@ -63,7 +64,7 @@ def play(window, surface, clock, chapter_num):
     show_preview = False
     anim = {'phase': 'idle', 'pull': 0, 'start': 0, 'arrow_x': 0, 'arrow_y': 0, 'hit': False, 'impact_start': 0}
     result_msg = None
-    error_reason = ""  # Armazena o motivo do erro
+    error_reason = ""
     attempts = 2
 
     while True:
@@ -116,26 +117,24 @@ def play(window, surface, clock, chapter_num):
 
             if math.hypot(ax - phase['target']['x'], ay - phase['target']['y']) < phase['target']['r']:
                 anim['phase'], anim['hit'], anim['impact_start'] = 'impact', True, now
-            elif ax > phase['target']['x'] + 2 or ay < -2:  # Caiu no chão ou passou
+            elif ax > phase['target']['x'] + 2 or ay < -2:
                 anim['phase'], anim['hit'], anim['impact_start'] = 'impact', False, now
 
         elif anim['phase'] == 'impact' and (now - anim['impact_start']) > 500:
             result_msg = 'hit' if anim['hit'] else 'miss'
             if not anim['hit']:
                 attempts -= 1
-
                 expr = input_text.replace("y=", "")
                 y_no_alvo = safe_eval(expr, phase['target']['x'])
 
                 if y_no_alvo == -99:
-                    error_reason = "Erro na sintaxe! Verifique se você usou 'x' corretamente e fechou os parênteses."
+                    error_reason = "Erro na sintaxe! Verifique se digitou a funcao corretamente."
                 elif y_no_alvo < phase['target']['y'] - phase['target']['r']:
-                    error_reason = f"Sua flecha passou por BAIXO. No alvo (x={phase['target']['x']}), ela estava em y={y_no_alvo:.1f}. Tente aumentar a altura da função."
+                    error_reason = f"Passou por BAIXO. No alvo (x={phase['target']['x']}), ela estava em y={y_no_alvo:.1f}. Aumente a altura."
                 elif y_no_alvo > phase['target']['y'] + phase['target']['r']:
-                    error_reason = f"Sua flecha passou por CIMA. No alvo (x={phase['target']['x']}), ela estava em y={y_no_alvo:.1f}. Tente diminuir a altura da função."
+                    error_reason = f"Passou por CIMA. No alvo (x={phase['target']['x']}), ela estava em y={y_no_alvo:.1f}. Diminua a altura."
                 else:
-                    error_reason = "A flecha caiu antes de chegar ou bateu em um obstáculo! Ajuste a curva."
-
+                    error_reason = "A flecha caiu antes ou bateu em um obstaculo!"
             anim['phase'] = 'done'
 
         if anim['phase'] in ('fly', 'impact'):
@@ -143,36 +142,53 @@ def play(window, surface, clock, chapter_num):
             pygame.draw.line(surface, (80, 60, 40), (fx - 5, fy), (fx + 5, fy), 2)
 
 
-        pygame.draw.rect(surface, (40, 40, 50), (0, CARDS_Y - 15, INTERNAL_W, 70))
-        pygame.draw.rect(surface, (255, 255, 255), (10, CARDS_Y - 10, 150, 20))
-        draw_text(surface, input_text, 15, CARDS_Y - 5, 16, (0, 0, 0))
+        pygame.draw.rect(surface, (30, 30, 40), (0, 160, INTERNAL_W, 80))
+        pygame.draw.line(surface, (100, 100, 110), (0, 160), (INTERNAL_W, 160), 2)
+
+
+        pygame.draw.rect(surface, (255, 255, 255), (10, 165, 150, 22))
+        pygame.draw.rect(surface, (100, 100, 100), (10, 165, 150, 22), 1)
+        draw_text(surface, input_text, 15, 172, 18, (0, 0, 0))
 
         mx, my = pygame.mouse.get_pos()
         mx, my = mx // SCALE, my // SCALE
         clicked_key = None
 
+
         for r, row in enumerate(KEYS):
             for c, key in enumerate(row):
-                kx = 10 + c * 22
-                ky = CARDS_Y + 15 + r * 12
-                kw, kh = 20, 10
+                kx = 10 + c * 24  # Teclas um pouco mais largas
+                ky = 192 + r * 11  # Espaçamento vertical melhor
+                kw, kh = 22, 9
 
-                color = (200, 200, 200)
+
+                color = (220, 220, 220)
+                text_color = (0, 0, 0)
+
                 if kx <= mx <= kx + kw and ky <= my <= ky + kh:
-                    color = (255, 255, 150)
+                    color = (255, 255, 150)  # Amarelo ao passar o mouse
                     if pygame.mouse.get_pressed()[0]: clicked_key = key
 
                 pygame.draw.rect(surface, color, (kx, ky, kw, kh))
-                draw_text(surface, key, kx + kw // 2, ky + kh // 2, 10, (0, 0, 0), center=True)
+                pygame.draw.rect(surface, (150, 150, 150), (kx, ky, kw, kh), 1)
 
-        btn_prev = (130, CARDS_Y + 5, 80, 15)
-        btn_fire = (130, CARDS_Y + 25, 80, 15)
+
+                draw_text(surface, key, kx + kw // 2, ky + kh // 2, 11, text_color, center=True)
+
+
+        btn_prev = (165, 170, 140, 25)
+        btn_fire = (165, 205, 140, 25)
+
 
         pygame.draw.rect(surface, (69, 123, 157), btn_prev)
-        draw_text(surface, "PREVISAO", btn_prev[0] + 40, btn_prev[1] + 7, 10, (255, 255, 255), center=True)
+        pygame.draw.rect(surface, (100, 160, 200), btn_prev, 2)  # Borda
+        draw_text(surface, "PREVISAO", btn_prev[0] + 70, btn_prev[1] + 12, 14, (255, 255, 255), center=True)
+
 
         pygame.draw.rect(surface, (200, 50, 50), btn_fire)
-        draw_text(surface, "ATIRAR", btn_fire[0] + 40, btn_fire[1] + 7, 10, (255, 255, 255), center=True)
+        pygame.draw.rect(surface, (255, 100, 100), btn_fire, 2)  # Borda
+        draw_text(surface, "ATIRAR", btn_fire[0] + 70, btn_fire[1] + 12, 14, (255, 255, 255), center=True)
+
 
         if pygame.mouse.get_pressed()[0]:
             if btn_prev[0] <= mx <= btn_prev[0] + btn_prev[2] and btn_prev[1] <= my <= btn_prev[1] + btn_prev[3]:
@@ -195,12 +211,14 @@ def play(window, surface, clock, chapter_num):
                     if len(input_text) < 15: input_text += clicked_key
                 pygame.time.wait(100)
 
-        draw_text(surface, f"Tentativas: {attempts}/2", 10, 10, 14, (255, 255, 255))
+
+        pygame.draw.rect(surface, (0, 0, 0, 150), (0, 0, 120, 20))  # Fundo preto semi-transparente
+        draw_text(surface, f"Tentativas: {attempts}/2", 5, 5, 16, (255, 255, 255))
 
 
         if result_msg:
             overlay = pygame.Surface((INTERNAL_W, INTERNAL_H));
-            overlay.set_alpha(180);
+            overlay.set_alpha(200);
             overlay.fill((0, 0, 0))
             surface.blit(overlay, (0, 0))
             msg = "ACERTOU!" if result_msg == 'hit' else "ERROU!"
@@ -208,9 +226,7 @@ def play(window, surface, clock, chapter_num):
 
             draw_text(surface, msg, INTERNAL_W // 2, 70, 30, color, center=True)
 
-
             final_tip = error_reason if result_msg == 'miss' else phase['tip']
-
 
             font = pygame.font.SysFont('Arial', 12)
             words = final_tip.split(' ')
@@ -225,7 +241,7 @@ def play(window, surface, clock, chapter_num):
             for i, line in enumerate(lines):
                 draw_text(surface, line, INTERNAL_W // 2, 110 + i * 18, 12, (255, 255, 255), center=True)
 
-            draw_text(surface, "Clique para continuar", INTERNAL_W // 2, 190, 12, (200, 200, 200), center=True)
+            draw_text(surface, "Clique para continuar", INTERNAL_W // 2, 200, 14, (200, 200, 200), center=True)
 
             if pygame.mouse.get_pressed()[0]:
                 if result_msg == 'hit':
