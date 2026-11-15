@@ -1,118 +1,129 @@
-# Function Archer
+Function Archer
 
-O Function Archer e um jogo educativo 2D desenvolvido em Python com a biblioteca Pygame. O objetivo do projeto e ensinar matematica de forma ludica e interativa, permitindo que o jogador controle a trajetoria de uma flecha atraves da escrita de funcoes matematicas.
+O Function Archer é um jogo educativo 2D desenvolvido em Python com a biblioteca Pygame. O objetivo do projeto é ensinar matemática de forma lúdica e interativa, permitindo que o jogador controle a trajetória de uma flecha através da escrita de funções matemáticas.
 
-O jogador deve digitar a equacao correta para que a flecha atinja o alvo, desviando de obstaculos. O jogo conta com um sistema de feedback inteligente que explica o motivo do erro, alem de um modulo teorico integrado para o estudo dos conceitos.
+O jogador deve digitar a equação correta para que a flecha atinja o alvo, desviando de obstáculos. O jogo conta com um sistema de feedback inteligente que explica o motivo do erro, além de um módulo teórico integrado para o estudo dos conceitos.
+Sumário
 
-## Sumario
+    Sobre o Projeto
 
-1. [Sobre o Projeto](#sobre-o-projeto)
-2. [Funcionalidades](#funcionalidades)
-3. [Tecnologias Utilizadas](#tecnologias-utilizadas)
-4. [Estrutura do Projeto](#estrutura-do-projeto)
-5. [Como Executar](#como-executar)
-6. [Conteudo Matematico](#conteudo-matematico)
-7. [Documentacao de Uso de IA](#documentacao-de-uso-de-ia)
-8. [Autores](#autores)
+    Funcionalidades
 
----
+    Tecnologias Utilizadas
 
-## Sobre o Projeto
+    Estrutura do Projeto
 
-O aprendizado de funcoes e calculos matematicos costuma ser abstrato para muitos estudantes. O Function Archer propoe a visualizacao imediata desses conceitos. Ao inserir uma equacao no jogo, o jogador ve instantaneamente a curva sendo tracada e a flecha seguindo exatamente aquele caminho.
+    Como Executar
 
-O projeto foi construido visando a interface e a experiencia do usuario, utilizando uma estetica pixel art. O menu principal e inspirado em jogos de blocos (estilo Minecraft) e o primeiro mundo possui tematica retro de plataforma 2D.
+    Conteúdo Matemático
 
-## Funcionalidades
+    Documentação de Uso de IA
 
-- **Menu Interativo:** Tela inicial com opcoes de Jogar e Aprender.
-- **Modulo Aprender:** Area de leitura com explicacoes detalhadas sobre Funcoes, Limites, Derivadas e Integrais.
-- **Selecao de Mundos:** Mapa de fases progressivo no estilo blocos 3D.
-- **Gameplay Baseado em Funcoes:** O jogador digita a equacao (ex: `y=2x+1` ou `y=3`) e o jogo calcula o voo da flecha.
-- **Teclado Virtual Integrado:** Interface com botoes na tela para insercao de caracteres especiais, como o expoente (`^`).
-- **Previsao de Trajetoria:** Ferramenta para desenhar a curva da funcao antes de atirar.
-- **Feedback Inteligente:** Se o jogador errar, o sistema calcula onde a flecha passou no eixo X e informa se ela passou por cima ou por baixo do alvo, auxiliando no ajuste da equacao.
+    Autores
 
-## Tecnologias Utilizadas
+Sobre o Projeto
 
-- **Python 3.10+:** Linguagem base do projeto.
-- **Pygame 2.6+:** Biblioteca para renderizacao grafica, controle de framerate e captura de eventos.
-- **Eval (Seguro):** Uso restrito para processar expressoes matematicas digitadas pelo jogador.
-- **Markdown:** Para a documentacao do repositorio.
+O aprendizado de funções e cálculos matemáticos costuma ser abstrato para muitos estudantes. O Function Archer propõe a visualização imediata desses conceitos. Ao inserir uma equação no jogo, o jogador vê instantaneamente a curva sendo traçada e a flecha seguindo exatamente aquele caminho.
 
-## Estrutura do Projeto
+O projeto foi construído visando a interface e a experiência do usuário, utilizando uma estética pixel art. O menu principal é inspirado em jogos de blocos (estilo Minecraft) e o primeiro mundo possui temática retrô de plataforma 2D.
+Funcionalidades
 
-```text
+    Menu Interativo: Tela inicial com opções de Jogar e Aprender.
+
+    Módulo Aprender: Área de leitura com explicações detalhadas sobre Funções, Limites, Derivadas e Integrais.
+
+    Seleção de Mundos: Mapa de fases progressivo no estilo blocos 3D.
+
+    Gameplay Baseado em Funções: O jogador digita a equação (ex: y=2x+1 ou y=3) e o jogo calcula o voo da flecha.
+
+    Teclado Virtual Integrado: Interface com botões na tela para inserção de caracteres especiais, como o expoente (^).
+
+    Previsão de Trajetória: Ferramenta para desenhar a curva da função antes de atirar.
+
+    Feedback Inteligente: Se o jogador errar, o sistema calcula onde a flecha passou no eixo X e informa se ela passou por cima ou por baixo do alvo, auxiliando no ajuste da equação.
+
+Tecnologias Utilizadas
+
+    Python 3.10+: Linguagem base do projeto.
+
+    Pygame 2.6+: Biblioteca para renderização gráfica, controle de framerate e captura de eventos.
+
+    Eval (Seguro): Uso restrito para processar expressões matemáticas digitadas pelo jogador.
+
+    Markdown: Para a documentação do repositório.
+
+Estrutura do Projeto
 jogo-funcao/
 ├── src/
 │   ├── main.py          # Ponto de entrada, gerencia os estados do jogo
-│   ├── config.py        # Constantes de tela, dimensoes e configuracoes
+│   ├── config.py        # Constantes de tela, dimensões e configurações
 │   ├── palette.py       # Paleta de cores e estilos visuais
-│   ├── sprites.py       # Matrizes de desenho dos personagens e cenario
-│   ├── renderer.py      # Funcoes auxiliares de desenho (textos, sprites)
+│   ├── sprites.py       # Matrizes de desenho dos personagens e cenário
+│   ├── renderer.py      # Funções auxiliares de desenho (textos, sprites)
 │   ├── save.py          # Sistema de salvamento de progresso (JSON)
-│   ├── menu.py          # Interface dos menus principal e de selecao
-│   ├── learn.py         # Interface do modulo teorico
-│   └── game.py          # Logica de gameplay, fisica e avaliacao de funcoes
+│   ├── menu.py          # Interface dos menus principal e de seleção
+│   ├── learn.py         # Interface do módulo teórico
+│   └── game.py          # Lógica de gameplay, física e avaliação de funções
 ├── .gitignore           # Arquivos ignorados pelo Git
-├── requirements.txt     # Dependencias do projeto
-└── README.md            # Documentacao
+├── requirements.txt     # Dependências do projeto
+└── README.md            # Documentação
 
 Como Executar
-Pre-requisitos
+Pré-requisitos
 
-E necessario ter o Python instalado em sua maquina e o ambiente virtual configurado.
+É necessário ter o Python instalado em sua máquina.
 Passo a Passo
 
-    Clone o repositorio:
-
+1. Clone o repositório:
 bash
 
 git clone https://github.com/seu-usuario/jogo-funcao.git
 cd jogo-funcao
 
-    Crie e ative um ambiente virtual (venv):
+2. Crie e ative um ambiente virtual (venv):
 
+No Windows:
 bash
 
 python -m venv .venv
-# Windows:
 .venv\Scripts\activate
-# Linux/Mac:
+
+No Linux ou Mac:
+bash
+
+python3 -m venv .venv
 source .venv/bin/activate
 
-    Instale as dependencias:
-
+3. Instale as dependências:
 bash
 
 pip install -r requirements.txt
 
-    Execute o jogo:
-
+4. Execute o jogo:
 bash
 
 python src/main.py
 
-Conteudo Matematico
+Conteúdo Matemático
 
-O projeto aborda os quatro eixos exigidos, integrando teoria e pratica:
+O projeto aborda os quatro eixos exigidos na disciplina, integrando teoria e prática:
 
-    Funcoes (Aula 1): O jogo trabalha diretamente com funcoes constantes, afins (primeiro grau) e quadraticas. A mecanica principal consiste em aplicar os coeficientes (a, b, c) no calculo da trajetoria (eixo y) em relacao ao deslocamento (eixo x).
+    Funções (Aula 1): O jogo trabalha diretamente com funções constantes, afins (primeiro grau) e quadráticas. A mecânica principal consiste em aplicar os coeficientes (a, b, c) no cálculo da trajetória (eixo y) em relação ao deslocamento (eixo x).
 
-    Limites (Aula 2): Conceito explorado no modulo "Aprender" e planejado para futuras fases onde alvos moveis exigirao a compreensao de aproximacao e tendencia de valores.
+    Limites (Aula 2): Conceito explorado no módulo "Aprender" e planejado para futuras fases onde alvos móveis exigirão a compreensão de aproximação e tendência de valores.
 
-    Derivadas (Aula 3): Apresentado no modulo teorico como a taxa de variacao instantanea, correlacionando com a inclinacao da reta tangente a trajetoria da flecha no ar.
+    Derivadas (Aula 3): Apresentado no módulo teórico como a taxa de variação instantânea, correlacionando com a inclinação da reta tangente à trajetória da flecha no ar.
 
-    Integrais (Aula 4): Apresentado no modulo teorico como o calculo de area sob a curva, com foco no acumulo de grandezas (ex: area percorrida abaixo da trajetoria da flecha).
+    Integrais (Aula 4): Apresentado no módulo teórico como o cálculo de área sob a curva, com foco no acúmulo de grandezas (ex: área percorrida abaixo da trajetória da flecha).
 
-Documentacao de Uso de IA
+Documentação de Uso de IA
 
-Em conformidade com as diretrizes de avaliacao, documentamos o uso de ferramentas de Inteligencia Artificial durante o desenvolvimento.
+Em conformidade com as diretrizes de avaliação, documentamos o uso de ferramentas de Inteligência Artificial durante o desenvolvimento.
 
-    Ferramenta Utilizada: [Nome da Ferramenta - Ex: ChatGPT, Claude]
+    Ferramenta Utilizada: [Coloque aqui o nome da IA, ex: ChatGPT, Claude]
 
-    Objetivo: Auxilio na estruturacao inicial do codigo, logica de renderizacao de pixel art, resolucao de bugs relacionados ao Pygame e formatacao de texto com quebra de linha automatica.
+    Objetivo: Auxílio na estruturação inicial do código, lógica de renderização de pixel art, resolução de bugs relacionados ao Pygame e formatação de texto com quebra de linha automática.
 
-    Validacao Humana: Todos os trechos de codigo sugeridos pela IA passaram por revisao humana. Foram feitas adaptacoes na paleta de cores, ajustes na logica de colisao (matematica vetorial) e adequacoes na interface de usuario para garantir que o jogo funcionasse corretamente e estivesse alinhado ao escopo pedagogico.
+    Validação Humana: Todos os trechos de código sugeridos pela IA passaram por revisão humana. Foram feitas adaptações na paleta de cores, ajustes na lógica de colisão (matemática vetorial) e adequações na interface de usuário para garantir que o jogo funcionasse corretamente e estivesse alinhado ao escopo pedagógico da disciplina.
 
-Projeto desenvolvido para a disciplina de Calculo Diferencial e Integral (CDI).
+Autores
