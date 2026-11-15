@@ -10,10 +10,16 @@ def draw_sprite(surface, sprite, x, y, palette=None):
                 pygame.draw.rect(surface, pal[ch], (x + col, y + row, 1, 1))
 
 
-def draw_text(surface, text, x, y, size=12, color=(60, 60, 70)):
-    font = pygame.font.Font(None, size)
-    surf = font.render(text, False, color)
-    surface.blit(surf, (x, y))
+
+def draw_text(surface, text, x, y, size=12, color=(60, 60, 70), center=False):
+
+    font = pygame.font.SysFont('Arial', size, bold=True)
+    surf = font.render(text, True, color)
+    if center:
+        rect = surf.get_rect(center=(x, y))
+        surface.blit(surf, rect)
+    else:
+        surface.blit(surf, (x, y))
 
 
 def draw_bow(surface, x, y, level=0, pull=0.0):
