@@ -42,6 +42,7 @@ O projeto foi construido visando a interface e a experiencia do usuario, utiliza
 
 ## Estrutura do Projeto
 
+```text
 jogo-funcao/
 ├── src/
 │   ├── main.py          # Ponto de entrada, gerencia os estados do jogo
@@ -63,14 +64,14 @@ Pre-requisitos
 E necessario ter o Python instalado em sua maquina e o ambiente virtual configurado.
 Passo a Passo
 
-   Clone o repositorio:
+    Clone o repositorio:
 
 bash
 
 git clone https://github.com/seu-usuario/jogo-funcao.git
 cd jogo-funcao
 
-   Crie e ative um ambiente virtual (venv):
+    Crie e ative um ambiente virtual (venv):
 
 bash
 
@@ -80,13 +81,13 @@ python -m venv .venv
 # Linux/Mac:
 source .venv/bin/activate
 
-   Instale as dependencias:
+    Instale as dependencias:
 
 bash
 
 pip install -r requirements.txt
 
-   Execute o jogo:
+    Execute o jogo:
 
 bash
 
@@ -96,23 +97,22 @@ Conteudo Matematico
 
 O projeto aborda os quatro eixos exigidos, integrando teoria e pratica:
 
-   Funcoes (Aula 1): O jogo trabalha diretamente com funcoes constantes, afins (primeiro grau) e quadraticas. A mecanica principal consiste em aplicar os coeficientes (a, b, c) no calculo da trajetoria (eixo y) em relacao ao deslocamento (eixo x).
+    Funcoes (Aula 1): O jogo trabalha diretamente com funcoes constantes, afins (primeiro grau) e quadraticas. A mecanica principal consiste em aplicar os coeficientes (a, b, c) no calculo da trajetoria (eixo y) em relacao ao deslocamento (eixo x).
 
-   Limites (Aula 2): Conceito explorado no modulo "Aprender" e planejado para futuras fases onde alvos moveis exigirao a compreensao de aproximacao e tendencia de valores.
+    Limites (Aula 2): Conceito explorado no modulo "Aprender" e planejado para futuras fases onde alvos moveis exigirao a compreensao de aproximacao e tendencia de valores.
 
-   Derivadas (Aula 3): Apresentado no modulo teorico como a taxa de variacao instantanea, correlacionando com a inclinacao da reta tangente a trajetoria da flecha no ar.
+    Derivadas (Aula 3): Apresentado no modulo teorico como a taxa de variacao instantanea, correlacionando com a inclinacao da reta tangente a trajetoria da flecha no ar.
 
-   Integrais (Aula 4): Apresentado no modulo teorico como o calculo de area sob a curva, com foco no acumulo de grandezas (ex: area percorrida abaixo da trajetoria da flecha).
+    Integrais (Aula 4): Apresentado no modulo teorico como o calculo de area sob a curva, com foco no acumulo de grandezas (ex: area percorrida abaixo da trajetoria da flecha).
 
 Documentacao de Uso de IA
 
 Em conformidade com as diretrizes de avaliacao, documentamos o uso de ferramentas de Inteligencia Artificial durante o desenvolvimento.
 
-   Ferramenta Utilizada: [ChatGPT, Claude e Deepseek]
+    Ferramenta Utilizada: [Nome da Ferramenta - Ex: ChatGPT, Claude]
 
-   Objetivo: Auxilio na estruturacao inicial do codigo, logica de renderizacao de pixel art, resolucao de bugs relacionados ao Pygame e formatacao de texto com quebra de linha automatica.
+    Objetivo: Auxilio na estruturacao inicial do codigo, logica de renderizacao de pixel art, resolucao de bugs relacionados ao Pygame e formatacao de texto com quebra de linha automatica.
 
-   Validacao Humana: Todos os trechos de codigo sugeridos pela IA passaram por revisao humana. Foram feitas adaptacoes na paleta de cores, ajustes na logica de colisao (matematica vetorial) e adequacoes na interface de usuario para garantir que o jogo funcionasse corretamente e estivesse alinhado ao escopo pedagogico.
-
+    Validacao Humana: Todos os trechos de codigo sugeridos pela IA passaram por revisao humana. Foram feitas adaptacoes na paleta de cores, ajustes na logica de colisao (matematica vetorial) e adequacoes na interface de usuario para garantir que o jogo funcionasse corretamente e estivesse alinhado ao escopo pedagogico.
 
 Projeto desenvolvido para a disciplina de Calculo Diferencial e Integral (CDI).
