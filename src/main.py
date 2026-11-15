@@ -14,7 +14,8 @@ def main():
     clock = pygame.time.Clock()
     surface = pygame.Surface((INTERNAL_W, INTERNAL_H))
 
-    state = 'main_menu'  # 'main_menu', 'learn', 'chapter_select', 'game'
+    state = 'main_menu'
+    learn_substate = 'grid'
 
     while True:
         mouse_pos = pygame.mouse.get_pos()
@@ -31,13 +32,22 @@ def main():
                         state = 'chapter_select'
                     elif action == "aprender":
                         state = 'learn'
+                        learn_substate = 'grid'
 
         elif state == 'learn':
-            learnmod.draw(surface)
+
+            action = learnmod.draw(surface, learn_substate, mouse_pos, SCALE)
+
+            if action == "voltar":
+                state = 'main_menu'
+            elif action == "voltar_lista":
+                learn_substate = 'grid'
+            elif isinstance(action, int):
+
+                learn_substate = action
+
             for event in pygame.event.get():
                 if event.type == pygame.QUIT: pygame.quit(); sys.exit()
-                if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
-                    state = 'main_menu'
 
         elif state == 'chapter_select':
             save_data = savemod.load()
@@ -48,13 +58,13 @@ def main():
                     state = 'main_menu'
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     chapter = menumod.hit_test(event.pos, SCALE, is_main_menu=False)
-                    if chapter == 1:  # Só liberado o 1 por enquanto
+                    if chapter == 1:
                         state = 'game'
 
         elif state == 'game':
             result = gamemod.play(window, surface, clock, 1)
             if result == 'quit': pygame.quit(); sys.exit()
-            state = 'chapter_select'  # Volta para a seleção de mundos
+            state = 'chapter_select'
 
         scaled = pygame.transform.scale(surface, (WINDOW_W, WINDOW_H))
         window.blit(scaled, (0, 0))
