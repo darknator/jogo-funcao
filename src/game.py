@@ -17,7 +17,6 @@ PHASES = [
     }
 ]
 
-
 KEYS = [
     ['7', '8', '9', '^', 'C'],
     ['4', '5', '6', '*', '<'],
@@ -38,7 +37,37 @@ def world_to_px(x, y): return (GAME_X + int(x * GAME_UNIT), GAME_Y - int(y * GAM
 
 
 def draw_mario_bg(surface):
+
     surface.fill(MARIO_SKY)
+
+
+    for cx, cy in [(30, 40), (150, 60), (260, 30)]:
+        pygame.draw.rect(surface, (255, 255, 255), (cx, cy, 30, 10))
+        pygame.draw.rect(surface, (255, 255, 255), (cx + 5, cy - 5, 20, 10))
+        pygame.draw.rect(surface, (255, 255, 255), (cx + 10, cy - 10, 10, 10))
+
+
+    for bx, by in [(10, GAME_Y - 15), (120, GAME_Y - 20), (250, GAME_Y - 12)]:
+        pygame.draw.rect(surface, MARIO_PIPE_GREEN, (bx, by, 40, 20))
+        pygame.draw.circle(surface, MARIO_PIPE_GREEN, (bx + 10, by), 10)
+        pygame.draw.circle(surface, MARIO_PIPE_GREEN, (bx + 30, by), 10)
+        pygame.draw.circle(surface, MARIO_PIPE_GREEN, (bx + 20, by - 10), 15)
+
+
+    for gx in range(0, 22):
+        px, _ = world_to_px(gx, 0)
+        pygame.draw.line(surface, (150, 180, 240), (px, 0), (px, GAME_Y), 1)
+
+    for gy in range(0, 11):
+        _, py = world_to_px(0, gy)
+        pygame.draw.line(surface, (150, 180, 240), (GAME_X, py), (INTERNAL_W, py), 1)
+
+
+    _, y0 = world_to_px(0, 0)
+    pygame.draw.line(surface, (80, 80, 80), (GAME_X, y0), (INTERNAL_W, y0), 2)  # Eixo X
+    pygame.draw.line(surface, (80, 80, 80), (GAME_X, 0), (GAME_X, y0), 2)  # Eixo Y
+
+
     ground_pal = {'L': MARIO_GROUND_LIGHT, 'D': MARIO_GROUND_MAIN}
     for x in range(0, INTERNAL_W, 16):
         for y in range(GAME_Y, INTERNAL_H, 16):
@@ -103,7 +132,6 @@ def play(window, surface, clock, chapter_num):
             except:
                 pass
 
-
         if anim['phase'] == 'pull':
             t = (now - anim['start']) / 300.0
             anim['pull'] = min(1, t)
@@ -145,7 +173,6 @@ def play(window, surface, clock, chapter_num):
         pygame.draw.rect(surface, (30, 30, 40), (0, 160, INTERNAL_W, 80))
         pygame.draw.line(surface, (100, 100, 110), (0, 160), (INTERNAL_W, 160), 2)
 
-
         pygame.draw.rect(surface, (255, 255, 255), (10, 165, 150, 22))
         pygame.draw.rect(surface, (100, 100, 100), (10, 165, 150, 22), 1)
         draw_text(surface, input_text, 15, 172, 18, (0, 0, 0))
@@ -154,41 +181,33 @@ def play(window, surface, clock, chapter_num):
         mx, my = mx // SCALE, my // SCALE
         clicked_key = None
 
-
         for r, row in enumerate(KEYS):
             for c, key in enumerate(row):
-                kx = 10 + c * 24  # Teclas um pouco mais largas
-                ky = 192 + r * 11  # Espaçamento vertical melhor
+                kx = 10 + c * 24
+                ky = 192 + r * 11
                 kw, kh = 22, 9
-
 
                 color = (220, 220, 220)
                 text_color = (0, 0, 0)
 
                 if kx <= mx <= kx + kw and ky <= my <= ky + kh:
-                    color = (255, 255, 150)  # Amarelo ao passar o mouse
+                    color = (255, 255, 150)
                     if pygame.mouse.get_pressed()[0]: clicked_key = key
 
                 pygame.draw.rect(surface, color, (kx, ky, kw, kh))
                 pygame.draw.rect(surface, (150, 150, 150), (kx, ky, kw, kh), 1)
-
-
                 draw_text(surface, key, kx + kw // 2, ky + kh // 2, 11, text_color, center=True)
-
 
         btn_prev = (165, 170, 140, 25)
         btn_fire = (165, 205, 140, 25)
 
-
         pygame.draw.rect(surface, (69, 123, 157), btn_prev)
-        pygame.draw.rect(surface, (100, 160, 200), btn_prev, 2)  # Borda
+        pygame.draw.rect(surface, (100, 160, 200), btn_prev, 2)
         draw_text(surface, "PREVISAO", btn_prev[0] + 70, btn_prev[1] + 12, 14, (255, 255, 255), center=True)
 
-
         pygame.draw.rect(surface, (200, 50, 50), btn_fire)
-        pygame.draw.rect(surface, (255, 100, 100), btn_fire, 2)  # Borda
+        pygame.draw.rect(surface, (255, 100, 100), btn_fire, 2)
         draw_text(surface, "ATIRAR", btn_fire[0] + 70, btn_fire[1] + 12, 14, (255, 255, 255), center=True)
-
 
         if pygame.mouse.get_pressed()[0]:
             if btn_prev[0] <= mx <= btn_prev[0] + btn_prev[2] and btn_prev[1] <= my <= btn_prev[1] + btn_prev[3]:
@@ -211,10 +230,8 @@ def play(window, surface, clock, chapter_num):
                     if len(input_text) < 15: input_text += clicked_key
                 pygame.time.wait(100)
 
-
-        pygame.draw.rect(surface, (0, 0, 0, 150), (0, 0, 120, 20))  # Fundo preto semi-transparente
+        pygame.draw.rect(surface, (0, 0, 0), (0, 0, 120, 20))
         draw_text(surface, f"Tentativas: {attempts}/2", 5, 5, 16, (255, 255, 255))
-
 
         if result_msg:
             overlay = pygame.Surface((INTERNAL_W, INTERNAL_H));

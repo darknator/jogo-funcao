@@ -22,7 +22,6 @@ def draw_mc_button(surface, x, y, w, h, text, color, hover=False):
 
 def draw_main_menu(surface, mouse_pos, scale):
     surface.fill(UI_BG)
-    # Fundo texturizado
     for y in range(0, 240, 8):
         for x in range(0, 320, 8):
             if (x + y) % 16 == 0: pygame.draw.rect(surface, (40, 40, 40), (x, y, 4, 4))
@@ -71,17 +70,18 @@ def draw_chapter_select(surface, save_data, mouse_pos, scale):
 
         color = CHAPTER_COLORS[i] if unlocked else tuple(c // 3 for c in CHAPTER_COLORS[i])
 
-        # Botão do mundo
         pygame.draw.rect(surface, (20, 20, 20), (x, y, w, h))
         pygame.draw.rect(surface, color, (x + 2, y + 2, w - 4, h - 4))
         if hover and unlocked:
             pygame.draw.rect(surface, (255, 255, 255), (x + 2, y + 2, w - 4, h - 4), 2)
 
         draw_text(surface, str(ch), x + w // 2, y + 15, 20, (255, 255, 255), center=True)
+
+
         if unlocked:
-            draw_text(surface, CHAPTER_NAMES[i][:8], x + w // 2, y + h - 15, 8, (255, 255, 255), center=True)
+            draw_text(surface, CHAPTER_NAMES[i], x + w // 2, y + h - 15, 9, (255, 255, 255), center=True)
         else:
-            draw_text(surface, "LOCK", x + w // 2, y + h - 15, 10, (150, 150, 150), center=True)
+            draw_text(surface, "BLOQUEADO", x + w // 2, y + h - 15, 9, (150, 150, 150), center=True)
 
 
 def hit_test(mouse_pos, scale, is_main_menu=False):
