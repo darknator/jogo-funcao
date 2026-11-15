@@ -2,23 +2,21 @@ import pygame
 import math
 from config import *
 from palette import *
-from sprites import STEVE, TARGET, MARIO_GROUND, GOOMBA
+from sprites import STEVE, TARGET, MARIO_GROUND
 from renderer import draw_sprite, draw_text, draw_bow
-import save as savemod
 
 PHASES = [
     {
         'id': '1-1', 'chapter': 1, 'archer': {'x': 0, 'y': 3}, 'target': {'x': 8, 'y': 3, 'r': 0.8},
-        'obstacles': [], 'tip': 'Para acertar, a flecha deve manter a altura y = 3.'
+        'obstacles': [], 'tip': 'A flecha precisa manter a altura exata de y = 3.'
     },
     {
         'id': '1-2', 'chapter': 1, 'archer': {'x': 0, 'y': 2}, 'target': {'x': 10, 'y': 2, 'r': 0.8},
         'obstacles': [{'type': 'pipe', 'x': 5, 'y': 0, 'h': 2.5}],
-        'tip': 'A flecha deve manter a altura y = 2 para passar por cima do cano.'
+        'tip': 'Para passar pelo cano, y deve ser constante em 2.'
     }
 ]
 
-#
 KEYS = [
     ['7', '8', '9', '+', 'C'],
     ['4', '5', '6', '-', '<'],
@@ -29,7 +27,6 @@ KEYS = [
 
 def safe_eval(eq_str, x_val):
     try:
-
         eq = eq_str.replace('^', '**')
         return eval(eq, {"__builtins__": None}, {"x": x_val, "math": math})
     except:
@@ -66,19 +63,18 @@ def play(window, surface, clock, chapter_num):
     show_preview = False
     anim = {'phase': 'idle', 'pull': 0, 'start': 0, 'arrow_x': 0, 'arrow_y': 0, 'hit': False, 'impact_start': 0}
     result_msg = None
+    error_reason = ""  # Armazena o motivo do erro
     attempts = 2
 
     while True:
         clock.tick(60)
         now = pygame.time.get_ticks()
 
-
         for event in pygame.event.get():
             if event.type == pygame.QUIT: return 'quit'
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE: return 'menu'
                 if event.key == pygame.K_RETURN and anim['phase'] == 'idle' and result_msg is None:
-
                     anim['phase'] = 'pull';
                     anim['start'] = now
                 if event.key == pygame.K_BACKSPACE:
@@ -87,13 +83,11 @@ def play(window, surface, clock, chapter_num):
         draw_mario_bg(surface)
         for obs in phase['obstacles']: draw_obstacle(surface, obs)
 
-
         ax, ay = world_to_px(phase['archer']['x'], phase['archer']['y'])
         draw_sprite(surface, STEVE, ax - 9, ay - 8)
         draw_bow(surface, ax, ay, 0, anim['pull'] if anim['phase'] == 'pull' else 0)
         tx, ty = world_to_px(phase['target']['x'], phase['target']['y'])
         draw_sprite(surface, TARGET, tx - 8, ty - 8)
-
 
         if show_preview and anim['phase'] == 'idle' and result_msg is None:
             try:
@@ -122,11 +116,26 @@ def play(window, surface, clock, chapter_num):
 
             if math.hypot(ax - phase['target']['x'], ay - phase['target']['y']) < phase['target']['r']:
                 anim['phase'], anim['hit'], anim['impact_start'] = 'impact', True, now
-            elif ax > phase['target']['x'] + 2 or ay < 0:
+            elif ax > phase['target']['x'] + 2 or ay < -2:  # Caiu no chão ou passou
                 anim['phase'], anim['hit'], anim['impact_start'] = 'impact', False, now
+
         elif anim['phase'] == 'impact' and (now - anim['impact_start']) > 500:
             result_msg = 'hit' if anim['hit'] else 'miss'
-            if not anim['hit']: attempts -= 1
+            if not anim['hit']:
+                attempts -= 1
+
+                expr = input_text.replace("y=", "")
+                y_no_alvo = safe_eval(expr, phase['target']['x'])
+
+                if y_no_alvo == -99:
+                    error_reason = "Erro na sintaxe! Verifique se você usou 'x' corretamente e fechou os parênteses."
+                elif y_no_alvo < phase['target']['y'] - phase['target']['r']:
+                    error_reason = f"Sua flecha passou por BAIXO. No alvo (x={phase['target']['x']}), ela estava em y={y_no_alvo:.1f}. Tente aumentar a altura da função."
+                elif y_no_alvo > phase['target']['y'] + phase['target']['r']:
+                    error_reason = f"Sua flecha passou por CIMA. No alvo (x={phase['target']['x']}), ela estava em y={y_no_alvo:.1f}. Tente diminuir a altura da função."
+                else:
+                    error_reason = "A flecha caiu antes de chegar ou bateu em um obstáculo! Ajuste a curva."
+
             anim['phase'] = 'done'
 
         if anim['phase'] in ('fly', 'impact'):
@@ -135,11 +144,8 @@ def play(window, surface, clock, chapter_num):
 
 
         pygame.draw.rect(surface, (40, 40, 50), (0, CARDS_Y - 15, INTERNAL_W, 70))
-
-
         pygame.draw.rect(surface, (255, 255, 255), (10, CARDS_Y - 10, 150, 20))
         draw_text(surface, input_text, 15, CARDS_Y - 5, 16, (0, 0, 0))
-
 
         mx, my = pygame.mouse.get_pos()
         mx, my = mx // SCALE, my // SCALE
@@ -154,12 +160,10 @@ def play(window, surface, clock, chapter_num):
                 color = (200, 200, 200)
                 if kx <= mx <= kx + kw and ky <= my <= ky + kh:
                     color = (255, 255, 150)
-                    if pygame.mouse.get_pressed()[0]:
-                        clicked_key = key
+                    if pygame.mouse.get_pressed()[0]: clicked_key = key
 
                 pygame.draw.rect(surface, color, (kx, ky, kw, kh))
                 draw_text(surface, key, kx + kw // 2, ky + kh // 2, 10, (0, 0, 0), center=True)
-
 
         btn_prev = (130, CARDS_Y + 5, 80, 15)
         btn_fire = (130, CARDS_Y + 25, 80, 15)
@@ -169,7 +173,6 @@ def play(window, surface, clock, chapter_num):
 
         pygame.draw.rect(surface, (200, 50, 50), btn_fire)
         draw_text(surface, "ATIRAR", btn_fire[0] + 40, btn_fire[1] + 7, 10, (255, 255, 255), center=True)
-
 
         if pygame.mouse.get_pressed()[0]:
             if btn_prev[0] <= mx <= btn_prev[0] + btn_prev[2] and btn_prev[1] <= my <= btn_prev[1] + btn_prev[3]:
@@ -187,15 +190,14 @@ def play(window, surface, clock, chapter_num):
                 elif clicked_key == '<':
                     input_text = input_text[:-1] if len(input_text) > 2 else "y="
                 elif clicked_key == '=':
-                    pass  #
+                    pass
                 else:
                     if len(input_text) < 15: input_text += clicked_key
                 pygame.time.wait(100)
 
-
         draw_text(surface, f"Tentativas: {attempts}/2", 10, 10, 14, (255, 255, 255))
 
-        
+
         if result_msg:
             overlay = pygame.Surface((INTERNAL_W, INTERNAL_H));
             overlay.set_alpha(180);
@@ -203,9 +205,27 @@ def play(window, surface, clock, chapter_num):
             surface.blit(overlay, (0, 0))
             msg = "ACERTOU!" if result_msg == 'hit' else "ERROU!"
             color = (42, 157, 143) if result_msg == 'hit' else (230, 57, 70)
-            draw_text(surface, msg, INTERNAL_W // 2, 80, 30, color, center=True)
-            draw_text(surface, phase['tip'], INTERNAL_W // 2, 120, 14, (255, 255, 255), center=True)
-            draw_text(surface, "Clique para continuar", INTERNAL_W // 2, 180, 12, (200, 200, 200), center=True)
+
+            draw_text(surface, msg, INTERNAL_W // 2, 70, 30, color, center=True)
+
+
+            final_tip = error_reason if result_msg == 'miss' else phase['tip']
+
+
+            font = pygame.font.SysFont('Arial', 12)
+            words = final_tip.split(' ')
+            lines, current = [], ""
+            for w in words:
+                if font.size(current + w + " ")[0] < 280:
+                    current += w + " "
+                else:
+                    lines.append(current); current = w + " "
+            lines.append(current)
+
+            for i, line in enumerate(lines):
+                draw_text(surface, line, INTERNAL_W // 2, 110 + i * 18, 12, (255, 255, 255), center=True)
+
+            draw_text(surface, "Clique para continuar", INTERNAL_W // 2, 190, 12, (200, 200, 200), center=True)
 
             if pygame.mouse.get_pressed()[0]:
                 if result_msg == 'hit':
