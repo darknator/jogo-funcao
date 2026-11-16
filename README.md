@@ -259,12 +259,12 @@ O uso dessas ferramentas teve como objetivo auxiliar o desenvolvimento, mantendo
 
 Projeto desenvolvido por:
 
-- Nome do Integrante 1
-- Nome do Integrante 2
-- Nome do Integrante 3
-- Nome do Integrante 4
+- Gustavo
+- João Edu Araújo Silva
+- Pedro Lucas Batista Pereira
+- Thiago Lopes Teobaldo
 
-**Disciplina:** Cálculo Diferencial e Integral (CDI).
+**Disciplina:** Cálculo Diferencial e Integral, Algoritmo.
 
 **Instituição:** UniCatólica.
 
