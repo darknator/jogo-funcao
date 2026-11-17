@@ -259,7 +259,7 @@ O uso dessas ferramentas teve como objetivo auxiliar o desenvolvimento, mantendo
 
 Projeto desenvolvido por:
 
-- Gustavo
+- Jefferson Gustavo Fernandes Estevam
 - João Edu Araújo Silva
 - Pedro Lucas Batista Pereira
 - Thiago Lopes Teobaldo
