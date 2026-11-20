@@ -16,6 +16,7 @@ def main():
 
     state = 'main_menu'
     learn_substate = 'grid'
+    current_chapter = 1
 
     while True:
         mouse_pos = pygame.mouse.get_pos()
@@ -58,11 +59,15 @@ def main():
                     state = 'main_menu'
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     chapter = menumod.hit_test(event.pos, SCALE, is_main_menu=False)
-                    if chapter == 1:
+                    unlocked = chapter == 1 or (
+                                chapter is not None and (chapter - 1) in save_data['chapters_completed'])
+
+                    if chapter is not None and unlocked and gamemod.has_phases(chapter):
+                        current_chapter = chapter
                         state = 'game'
 
         elif state == 'game':
-            result = gamemod.play(window, surface, clock, 1)
+            result = gamemod.play(window, surface, clock, current_chapter)
             if result == 'quit': pygame.quit(); sys.exit()
             state = 'chapter_select'
 
