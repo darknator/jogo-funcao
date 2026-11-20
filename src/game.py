@@ -8,8 +8,7 @@ from sprites import STEVE, TARGET, MARIO_GROUND
 from renderer import draw_sprite, draw_text, draw_bow
 import save as savemod
 
-
-
+    
 PHASES = [
     {
         'id': '1-1', 'chapter': 1, 'tipo': 'Constante',
