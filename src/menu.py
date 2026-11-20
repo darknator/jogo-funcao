@@ -50,7 +50,7 @@ def get_tiles():
     start_x = (INTERNAL_W - total_w) // 2
     return [
         (start_x + (i % GRID_COLS) * (TILE_W + TILE_GAP), 60 + (i // GRID_COLS) * (TILE_H + TILE_GAP), TILE_W, TILE_H)
-        for i in range(8)]
+        for i in range(len(CHAPTER_NAMES))]
 
 
 def draw_chapter_select(surface, save_data, mouse_pos, scale):
@@ -76,7 +76,6 @@ def draw_chapter_select(surface, save_data, mouse_pos, scale):
             pygame.draw.rect(surface, (255, 255, 255), (x + 2, y + 2, w - 4, h - 4), 2)
 
         draw_text(surface, str(ch), x + w // 2, y + 15, 20, (255, 255, 255), center=True)
-
 
         if unlocked:
             draw_text(surface, CHAPTER_NAMES[i], x + w // 2, y + h - 15, 9, (255, 255, 255), center=True)
