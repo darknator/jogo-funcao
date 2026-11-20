@@ -9,11 +9,13 @@ from renderer import draw_sprite, draw_text, draw_bow
 import save as savemod
 
 
+
 PHASES = [
     {
         'id': '1-1', 'chapter': 1, 'tipo': 'Constante',
         'archer': {'x': 0, 'y': 3}, 'target': {'x': 8, 'y': 3, 'r': 0.8},
         'obstacles': [],
+        'goal': 'A flecha voa reta, sempre na mesma altura do alvo. Digite só o número.',
         'dominio': 'R', 'imagem': '{3}', 'solution': 'y=3',
         'tip': 'Função constante: y = c. A flecha voa reta, sempre na altura 3, não importa o valor de x.',
         'miss_hint': 'Na função constante não aparece x: o número que você digita é a altura da flecha.'
@@ -22,6 +24,7 @@ PHASES = [
         'id': '1-2', 'chapter': 1, 'tipo': 'Linear',
         'archer': {'x': 0, 'y': 0}, 'target': {'x': 4, 'y': 8, 'r': 0.8},
         'obstacles': [{'type': 'pipe', 'x': 2, 'y': 0, 'h': 2.5}],
+        'goal': 'A reta sai de (0,0) e passa pelo alvo. Quanto y sobe para cada 1 de x? Use y=a*x.',
         'dominio': 'R', 'imagem': 'R', 'solution': 'y=2*x',
         'tip': 'Função linear: y = a*x. Passa pela origem (0,0) e sobe a unidades a cada 1 em x. Aqui a = 2.',
         'miss_hint': 'Na linear a reta sai da origem. Divida a altura do alvo pela distância dele: a = y / x.'
@@ -30,6 +33,7 @@ PHASES = [
         'id': '1-3', 'chapter': 1, 'tipo': 'Afim',
         'archer': {'x': 0, 'y': 2}, 'target': {'x': 8, 'y': 6, 'r': 0.8},
         'obstacles': [{'type': 'pipe', 'x': 3, 'y': 0, 'h': 2.5}],
+        'goal': 'A reta sai de y=2 (esse é o b) e chega ao alvo. Falta achar a inclinação a em y=a*x+b.',
         'dominio': 'R', 'imagem': 'R', 'solution': 'y=0.5*x+2',
         'tip': 'Função afim: y = a*x + b. O b é a altura de saída (y quando x=0) e o a é a inclinação. Aqui a = 0,5 e b = 2.',
         'miss_hint': 'Em y = a*x + b: b = altura do arqueiro; a = (subida até o alvo) / (distância até o alvo).'
@@ -38,6 +42,7 @@ PHASES = [
         'id': '1-4', 'chapter': 1, 'tipo': 'Quadrática',
         'archer': {'x': 0, 'y': 0}, 'target': {'x': 6, 'y': 0, 'r': 0.8},
         'obstacles': [{'type': 'pipe', 'x': 3, 'y': 0, 'h': 6}],
+        'goal': 'Parábola: sai do chão, passa por cima do cano e volta ao chão no alvo (raízes 0 e 6).',
         'dominio': 'R', 'imagem': '(-inf, 9]', 'solution': 'y=6*x-x^2',
         'tip': 'Função quadrática: y = a*x^2 + b*x + c. Arqueiro e alvo estão no chão (y=0): são as raízes 0 e 6. Com a<0 a parábola abre para baixo e o vértice (3, 9) é o ponto mais alto.',
         'miss_hint': 'Raízes 0 e 6: y = -x*(x-6) = 6*x - x^2. O sinal negativo (a < 0) faz a flecha subir e depois descer.'
@@ -46,6 +51,7 @@ PHASES = [
         'id': '1-5', 'chapter': 1, 'tipo': 'Exponencial',
         'archer': {'x': 0, 'y': 1}, 'target': {'x': 3, 'y': 8, 'r': 0.8},
         'obstacles': [{'type': 'pipe', 'x': 2, 'y': 0, 'h': 2.5}],
+        'goal': 'A curva começa em y=1 e a cada passo em x o valor é multiplicado pela base a em y=a^x.',
         'dominio': 'R', 'imagem': '(0, +inf)', 'solution': 'y=2^x',
         'tip': 'Função exponencial: y = a^x. Em x=0 vale sempre 1 e a cada passo em x o valor é multiplicado por a. Com a = 2: 1, 2, 4, 8.',
         'miss_hint': 'Em y = a^x a flecha começa em y=1. Teste qual base a faz y chegar a 8 quando x=3 (a*a*a = 8).'
@@ -204,7 +210,7 @@ def has_phases(chapter):
 
 
 def stars_for(errors):
-
+    """3 estrelas sem erros, 2 com ate 2 erros, 1 nos demais casos."""
     return 3 if errors == 0 else 2 if errors <= 2 else 1
 
 
@@ -256,6 +262,26 @@ def draw_obstacle(surface, obs):
         pygame.draw.rect(surface, (0, 0, 0), (px - 2, py - pipe_h - 8, pipe_w + 4, 8), 1)
 
 
+def draw_arrow(surface, f, x, y):
+
+    fx, fy = world_to_px(x, y)
+    ux, uy = 1.0, 0.0
+    if f is not None:
+        y1, y2 = f(x - 0.05), f(x + 0.05)
+        if y1 is not None and y2 is not None:
+            dx, dy = 0.1 * GAME_UNIT, -(y2 - y1) * GAME_UNIT
+            n = math.hypot(dx, dy)
+            ux, uy = dx / n, dy / n
+    tail = (fx - ux * 6, fy - uy * 6)
+    tip = (fx + ux * 5, fy + uy * 5)
+    pygame.draw.line(surface, (80, 60, 40), tail, tip, 2)
+    # ponta da flecha
+    px_, py_ = -uy, ux
+    pygame.draw.polygon(surface, (40, 40, 40), [(tip[0] + ux * 3, tip[1] + uy * 3),
+                                                (tip[0] + px_ * 2, tip[1] + py_ * 2),
+                                                (tip[0] - px_ * 2, tip[1] - py_ * 2)])
+
+
 def new_anim():
     return {'phase': 'idle', 'pull': 0, 'start': 0, 'arrow_x': 0, 'arrow_y': 0, 'hit': False, 'impact_start': 0}
 
@@ -299,10 +325,13 @@ def play(window, surface, clock, chapter_num):
         clock.tick(60)
         now = pygame.time.get_ticks()
         continue_key = False
+        click_pos = None
         can_type = anim['phase'] == 'idle' and result_msg is None
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT: return 'quit'
+            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                click_pos = (event.pos[0] // SCALE, event.pos[1] // SCALE)
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE: return 'menu'
                 if event.key == pygame.K_RETURN:
@@ -314,9 +343,12 @@ def play(window, surface, clock, chapter_num):
                         show_preview = False
                 elif event.key == pygame.K_BACKSPACE and can_type:
                     input_text = input_text[:-1] if len(input_text) > 2 else "y="
-                elif can_type and event.unicode and event.unicode.lower() in TYPEABLE \
-                        and len(input_text) < MAX_EXPR_LEN:
-                    input_text += event.unicode.lower()
+                elif can_type and event.unicode and len(input_text) < MAX_EXPR_LEN:
+                    ch = event.unicode.lower()
+                    if ch == ',':
+                        ch = '.'
+                    if ch in TYPEABLE:
+                        input_text += ch
 
         draw_mario_bg(surface)
         for obs in phase['obstacles']: draw_obstacle(surface, obs)
@@ -330,7 +362,7 @@ def play(window, surface, clock, chapter_num):
         if show_preview and anim['phase'] == 'idle' and result_msg is None:
             f_prev, _ = compile_expr(input_text[2:])
             if f_prev:
-                for i in range(0, 72):  # de x=0 ate x=18, a cada 0.25
+                for i in range(0, 72):
                     px_val = i * 0.25
                     py_val = f_prev(px_val)
                     if py_val is not None and -0.5 < py_val < 10.5:
@@ -341,8 +373,7 @@ def play(window, surface, clock, chapter_num):
             t = (now - anim['start']) / 300.0
             anim['pull'] = min(1, t)
             if t >= 1.1:
-                # a trajetoria inteira (acerto, cano, chao, motivo do erro) e calculada de uma vez;
-                # a animacao so percorre o caminho ate o ponto de parada.
+
                 shot = evaluate_shot(phase, input_text[2:])
                 anim['arrow_x'], anim['arrow_y'] = phase['archer']['x'], phase['archer']['y']
                 anim['phase'], anim['start'] = 'fly', now
@@ -368,8 +399,7 @@ def play(window, surface, clock, chapter_num):
             anim['phase'] = 'done'
 
         if anim['phase'] in ('fly', 'impact'):
-            fx, fy = world_to_px(anim['arrow_x'], anim['arrow_y'])
-            pygame.draw.line(surface, (80, 60, 40), (fx - 5, fy), (fx + 5, fy), 2)
+            draw_arrow(surface, shot['f'] if shot else None, anim['arrow_x'], anim['arrow_y'])
 
         pygame.draw.rect(surface, (30, 30, 40), (0, 160, INTERNAL_W, 80))
         pygame.draw.line(surface, (100, 100, 110), (0, 160), (INTERNAL_W, 160), 2)
@@ -394,7 +424,8 @@ def play(window, surface, clock, chapter_num):
 
                 if kx <= mx <= kx + kw and ky <= my <= ky + kh:
                     color = (255, 255, 150)
-                    if pygame.mouse.get_pressed()[0] and can_type: clicked_key = key
+                if click_pos and can_type and kx <= click_pos[0] <= kx + kw and ky <= click_pos[1] <= ky + kh:
+                    clicked_key = key
 
                 pygame.draw.rect(surface, color, (kx, ky, kw, kh))
                 pygame.draw.rect(surface, (150, 150, 150), (kx, ky, kw, kh), 1)
@@ -411,31 +442,39 @@ def play(window, surface, clock, chapter_num):
         pygame.draw.rect(surface, (255, 100, 100), btn_fire, 2)
         draw_text(surface, "ATIRAR", btn_fire[0] + 70, btn_fire[1] + 12, 14, (255, 255, 255), center=True)
 
-        if pygame.mouse.get_pressed()[0]:
-            if btn_prev[0] <= mx <= btn_prev[0] + btn_prev[2] and btn_prev[1] <= my <= btn_prev[1] + btn_prev[3]:
+        def inside(btn):
+            return click_pos and btn[0] <= click_pos[0] <= btn[0] + btn[2] and btn[1] <= click_pos[1] <= btn[1] + btn[3]
+
+        if click_pos and result_msg is None:
+            if inside(btn_prev):
                 show_preview = not show_preview
-                pygame.time.wait(150)
-            elif btn_fire[0] <= mx <= btn_fire[0] + btn_fire[2] and btn_fire[1] <= my <= btn_fire[1] + btn_fire[3]:
-                if anim['phase'] == 'idle' and result_msg is None:
-                    anim['phase'] = 'pull';
+            elif inside(btn_fire):
+                if anim['phase'] == 'idle':
+                    anim['phase'] = 'pull'
                     anim['start'] = now
                     show_preview = False
-                pygame.time.wait(150)
             elif clicked_key:
                 if clicked_key == 'C':
                     input_text = "y="
                 elif clicked_key == '<':
                     input_text = input_text[:-1] if len(input_text) > 2 else "y="
-                else:
-                    if len(input_text) + len(clicked_key) <= MAX_EXPR_LEN: input_text += clicked_key
-                pygame.time.wait(100)
+                elif len(input_text) + len(clicked_key) <= MAX_EXPR_LEN:
+                    input_text += clicked_key
 
-        # HUD: fase atual / tipo de funcao / tentativas + objetivo do tiro
+
         pygame.draw.rect(surface, (0, 0, 0), (0, 0, INTERNAL_W, 20))
         draw_text(surface, f"Fase {phase['id']} - {phase['tipo']}", 5, 4, 14, (255, 255, 255))
         draw_text(surface, f"Tentativas: {attempts}/2", INTERNAL_W - 100, 4, 14, (255, 255, 255))
-        draw_text(surface, f"Arqueiro ({phase['archer']['x']:g}, {phase['archer']['y']:g})  ->  "
-                           f"Alvo ({phase['target']['x']:g}, {phase['target']['y']:g})", 5, 24, 10, (255, 255, 255))
+
+
+        pygame.draw.rect(surface, (20, 20, 30), (168, 24, 148, 66))
+        pygame.draw.rect(surface, (255, 220, 100), (168, 24, 148, 66), 1)
+        draw_text(surface, f"Arqueiro: (x={phase['archer']['x']:g}, y={phase['archer']['y']:g})", 172, 27, 9,
+                  (255, 255, 255))
+        draw_text(surface, f"Alvo:     (x={phase['target']['x']:g}, y={phase['target']['y']:g})", 172, 38, 9,
+                  (255, 255, 255))
+        for i, line in enumerate(wrap_lines(phase['goal'], 9, 138)[:3]):
+            draw_text(surface, line, 172, 51 + i * 10, 9, (255, 220, 100))
 
         if result_msg:
             overlay = pygame.Surface((INTERNAL_W, INTERNAL_H));
@@ -448,7 +487,7 @@ def play(window, surface, clock, chapter_num):
             draw_text(surface, msg, INTERNAL_W // 2, 70, 30, color, center=True)
 
             if result_msg == 'hit':
-                # explicacao do conceito + identificacao de tipo, dominio e imagem (Aula 1)
+
                 lines = wrap_lines(phase['tip'], 11, 290)[:4]
                 for i, line in enumerate(lines):
                     draw_text(surface, line, INTERNAL_W // 2, 105 + i * 15, 11, (255, 255, 255), center=True)
@@ -465,10 +504,10 @@ def play(window, surface, clock, chapter_num):
 
             draw_text(surface, "Clique ou ENTER para continuar", INTERNAL_W // 2, 205, 12, (200, 200, 200), center=True)
 
-            if pygame.mouse.get_pressed()[0] or continue_key:
+            if click_pos or continue_key:
                 if result_msg == 'hit':
                     if phase_idx + 1 >= len(phases):
-                        # mundo concluido: salva progresso (libera o proximo mundo) e volta ao menu
+
                         data = savemod.load()
                         savemod.complete_chapter(data, chapter_num, stars_for(errors))
                         return 'menu'
@@ -480,10 +519,9 @@ def play(window, surface, clock, chapter_num):
                 elif attempts <= 0:
                     return 'menu'
                 else:
-                    # ainda ha tentativas: mantem a funcao digitada para o jogador ajustar
+
                     result_msg, show_preview = None, False
                     anim = new_anim()
-                pygame.time.wait(200)
 
         scaled = pygame.transform.scale(surface, (WINDOW_W, WINDOW_H))
         window.blit(scaled, (0, 0))
