@@ -340,8 +340,46 @@ def draw_grid_overlay(surface):
     surface.blit(overlay, (0, 0))
 
 def draw_mario_bg(surface, chapter_num):
-    global BG_MUNDO2, BG_PRATICA
-    
+    global BG_MUNDO2, BG_PRATICA, BG_MUNDO3
+
+    if chapter_num == 3:
+        fase = getattr(draw_mario_bg, "fase_atual", 0)
+
+        if fase < 2:
+            numero_cenario = 1
+        elif fase < 4:
+            numero_cenario = 2
+        else:
+            numero_cenario = 3
+
+        if numero_cenario not in BG_MUNDO3:
+            BG_MUNDO3[numero_cenario] = load_bg_image(
+                f"bg_mundo3_{numero_cenario}"
+            )
+
+        imagem = BG_MUNDO3[numero_cenario]
+
+        if imagem is not None:
+            surface.blit(imagem, (0, 0))
+            draw_grid_overlay(surface)
+
+            ground_pal = {
+                'L': MARIO_GROUND_LIGHT,
+                'D': MARIO_GROUND_MAIN
+            }
+
+            for x in range(0, INTERNAL_W, 32):
+                for y in range(CAMERA_Y, INTERNAL_H, 32):
+                    draw_sprite(
+                        surface, MARIO_GROUND,
+                        x, y, ground_pal, scale=2
+                    )
+
+            pygame.draw.line(
+                surface, (0, 0, 0),
+                (0, CAMERA_Y), (INTERNAL_W, CAMERA_Y), 3
+            )
+            return
     if chapter_num == 0:
         if BG_PRATICA is None: 
             BG_PRATICA = load_bg_image('bg_pratica')
