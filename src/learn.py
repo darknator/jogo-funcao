@@ -2,7 +2,7 @@ import pygame
 from config import INTERNAL_W
 from palette import UI_BG, UI_GOLD, UI_TEXT
 from renderer import draw_text
-
+from menu import draw_mc_button
 
 TOPICS_DATA = [
     {
@@ -78,47 +78,51 @@ def wrap_text(text, font, max_width):
 
 def draw(surface, state, mouse_pos, scale):
     surface.fill(UI_BG)
-
     for y in range(0, 480, 16):
         for x in range(0, 640, 16):
             if (x + y) % 32 == 0:
                 pygame.draw.rect(surface, (40, 40, 40), (x, y, 8, 8))
 
+    mx, my = mouse_pos[0] // scale, mouse_pos[1] // scale
+    action = None
+
     if state == 'grid':
         draw_text(surface, "APRENDER", INTERNAL_W // 2, 50, 48, UI_GOLD, center=True)
         draw_text(surface, "Escolha um topico para estudar:", INTERNAL_W // 2, 90, 24, UI_TEXT, center=True)
 
-        mx, my = mouse_pos[0] // scale, mouse_pos[1] // scale
-        action = None
-
         for i, topic in enumerate(TOPICS_DATA):
             x = 20 + (i % 2) * 310
-            y = 130 + (i // 2) * 150
+            y = 130 + (i // 2) * 130
 
-            hover = x <= mx <= x + 290 and y <= my <= y + 130
+            hover = x <= mx <= x + 290 and y <= my <= y + 110
             color = (70, 70, 80) if hover else (50, 50, 60)
 
-            pygame.draw.rect(surface, color, (x, y, 290, 130))
-            pygame.draw.rect(surface, (150, 150, 160) if hover else (100, 100, 110), (x, y, 290, 130), 3)
+            pygame.draw.rect(surface, color, (x, y, 290, 110))
+            pygame.draw.rect(surface, (150, 150, 160) if hover else (100, 100, 110), (x, y, 290, 110), 3)
 
             draw_text(surface, topic["title"], x + 145, y + 24, 32, (255, 255, 255), center=True)
 
             font_desc = pygame.font.SysFont('Arial', 18)
             lines = wrap_text(topic["desc"], font_desc, 270)
             for j, line in enumerate(lines[:3]):
-                draw_text(surface, line, x + 145, y + 64 + j * 24, 18, (200, 200, 200), center=True)
-
-            draw_text(surface, "[ Clique para ler ]", x + 145, y + 110, 16,
-                      (255, 255, 150) if hover else (150, 150, 150), center=True)
+                draw_text(surface, line, x + 145, y + 60 + j * 24, 18, (200, 200, 200), center=True)
 
             if pygame.mouse.get_pressed()[0] and hover:
                 action = i
                 pygame.time.wait(200)
 
-        draw_text(surface, "[ ESC ] Voltar ao Menu Principal", INTERNAL_W // 2, 450, 24, UI_TEXT, center=True)
+        # BOTÃO VOLTAR
+        btn_voltar = (INTERNAL_W // 2 - 100, 410, 200, 50)
+        hover_voltar = (btn_voltar[0] <= mx <= btn_voltar[0] + btn_voltar[2] and
+                        btn_voltar[1] <= my <= btn_voltar[1] + btn_voltar[3])
+        
+        draw_mc_button(surface, *btn_voltar, "VOLTAR", (100, 100, 100), hover_voltar)
+        draw_text(surface, "[ ESC ] Voltar", INTERNAL_W // 2, 470, 16, (150, 150, 150), center=True)
+        
+        if hover_voltar and pygame.mouse.get_pressed()[0]:
+            action = "voltar"
+            pygame.time.wait(200)
 
-        if action is not None:
-            return action
         if pygame.key.get_pressed()[pygame.K_ESCAPE]:
             return "voltar"
 
@@ -129,24 +133,33 @@ def draw(surface, state, mouse_pos, scale):
 
         draw_text(surface, topic["title"].upper(), INTERNAL_W // 2, 40, 44, UI_GOLD, center=True)
 
-        pygame.draw.rect(surface, (240, 240, 240), (30, 90, 580, 330))
-        pygame.draw.rect(surface, (100, 100, 100), (30, 90, 580, 330), 3)
+        pygame.draw.rect(surface, (240, 240, 240), (30, 80, 580, 320))
+        pygame.draw.rect(surface, (100, 100, 100), (30, 80, 580, 320), 3)
 
         font_content = pygame.font.SysFont('Arial', 22)
         lines = wrap_text(topic["content"], font_content, 540)
 
-        y_offset = 110
+        y_offset = 100
         for line in lines:
-            if y_offset > 400:
-                break
+            if y_offset > 380: break
             surf = font_content.render(line, True, (30, 30, 30))
             surface.blit(surf, (50, y_offset))
             y_offset += 28
 
-        draw_text(surface, "[ ESC ] Voltar a lista", INTERNAL_W // 2, 450, 24, UI_TEXT, center=True)
+        # BOTÃO VOLTAR A LISTA
+        btn_voltar = (INTERNAL_W // 2 - 100, 410, 200, 50)
+        hover_voltar = (btn_voltar[0] <= mx <= btn_voltar[0] + btn_voltar[2] and
+                        btn_voltar[1] <= my <= btn_voltar[1] + btn_voltar[3])
+        
+        draw_mc_button(surface, *btn_voltar, "VOLTAR", (100, 100, 100), hover_voltar)
+        draw_text(surface, "[ ESC ] Voltar a lista", INTERNAL_W // 2, 470, 16, (150, 150, 150), center=True)
+
+        if hover_voltar and pygame.mouse.get_pressed()[0]:
+            pygame.time.wait(200)
+            return "voltar_lista"
 
         if pygame.key.get_pressed()[pygame.K_ESCAPE]:
             pygame.time.wait(200)
             return "voltar_lista"
 
-    return None
+    return action

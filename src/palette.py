@@ -6,7 +6,6 @@ UI_TEXT = (224, 224, 224)
 UI_TEXT_SHADOW = (56, 56, 56)
 UI_GOLD = (255, 170, 0)
 
-
 MARIO_SKY = (92, 148, 252)
 MARIO_GROUND_MAIN = (200, 76, 12)
 MARIO_GROUND_LIGHT = (252, 188, 116)
@@ -14,7 +13,6 @@ MARIO_GROUND_DARK = (80, 32, 8)
 MARIO_PIPE_GREEN = (0, 168, 0)
 MARIO_PIPE_DARK = (0, 88, 0)
 MARIO_GOOMBA = (164, 76, 20)
-
 
 PALETTE = {
     '.': None,
@@ -24,7 +22,6 @@ PALETTE = {
     'B': (106, 76, 147),
 }
 
-
 CHAPTER_NAMES = ["Funções", "Derivadas"]
 CHAPTER_COLORS = [(69, 123, 157), (231, 111, 81)]
 BOW_LEVELS = [{'color': (139, 69, 19)}, {'color': (230, 220, 190)}, {'color': (180, 180, 195)}, {'color': (255, 200, 30)}, {'color': (150, 80, 220)}]
@@ -33,3 +30,6 @@ TRAIL_COLOR = (255, 220, 100)
 TRAIL_COLOR_HIT = (42, 220, 143)
 TRAIL_COLOR_MISS = (230, 80, 70)
 PREVIEW_COLOR = (106, 76, 147)
+
+# --- NOVA COR PARA O BOTÃO PRATICAR ---
+BTN_PRACTICE = (200, 120, 40)
