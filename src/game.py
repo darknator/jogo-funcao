@@ -8,12 +8,12 @@ from config import *
 from palette import *
 from sprites import STEVE, TARGET, MARIO_GROUND
 from renderer import draw_sprite, draw_text, draw_bow
+from menu import draw_mc_button
 import save as savemod
 
-# (MANTENHA O ARRAY PHASES AQUI COMO ESTAVA ANTES, ELE NÃO MUDOU)
+
 PHASES = [
-    # ... COPIE O ARRAY PHASES ORIGINAL AQUI ...
-    # Coloquei apenas um exemplo para não ficar gigante, mas você deve copiar o seu original inteiro
+    # ================= CAPÍTULO 1: FUNÇÕES =================
     {
         'id': '1-1', 'chapter': 1, 'tipo': 'Constante',
         'archer': {'x': 0, 'y': 3}, 'target': {'x': 8, 'y': 3, 'r': 0.8},
@@ -23,7 +23,89 @@ PHASES = [
         'tip': 'Funcao constante: y = c. A flecha voa reta, sempre na altura 3, nao importa o valor de x.',
         'miss_hint': 'Na funcao constante nao aparece x: o numero que voce digita e a altura da flecha.'
     },
-    # ... COPIE AS OUTRAS FASES ...
+    {
+        'id': '1-2', 'chapter': 1, 'tipo': 'Linear',
+        'archer': {'x': 0, 'y': 0}, 'target': {'x': 4, 'y': 8, 'r': 0.8},
+        'obstacles': [{'type': 'pipe', 'x': 2, 'y': 0, 'h': 2.5}],
+        'goal': 'A reta sai de (0,0) e passa pelo alvo. Quanto y sobe para cada 1 de x? Use y=a*x.',
+        'dominio': 'R', 'imagem': 'R', 'solution': 'y=2*x',
+        'tip': 'Funcao linear: y = a*x. Passa pela origem (0,0) e sobe a unidades a cada 1 em x. Aqui a = 2.',
+        'miss_hint': 'Na linear a reta sai da origem. Divida a altura do alvo pela distancia dele: a = y / x.'
+    },
+    {
+        'id': '1-3', 'chapter': 1, 'tipo': 'Afim',
+        'archer': {'x': 0, 'y': 2}, 'target': {'x': 8, 'y': 6, 'r': 0.8},
+        'obstacles': [{'type': 'pipe', 'x': 3, 'y': 0, 'h': 2.5}],
+        'goal': 'A reta sai de y=2 (esse e o b) e chega ao alvo. Falta achar a inclinacao a em y=a*x+b.',
+        'dominio': 'R', 'imagem': 'R', 'solution': 'y=0.5*x+2',
+        'tip': 'Funcao afim: y = a*x + b. O b e a altura de saida (y quando x=0) e o a e a inclinacao. Aqui a = 0,5 e b = 2.',
+        'miss_hint': 'Em y = a*x + b: b = altura do arqueiro; a = (subida ate o alvo) / (distancia ate o alvo).'
+    },
+    {
+        'id': '1-4', 'chapter': 1, 'tipo': 'Quadrática',
+        'archer': {'x': 0, 'y': 0}, 'target': {'x': 6, 'y': 0, 'r': 0.8},
+        'obstacles': [{'type': 'pipe', 'x': 3, 'y': 0, 'h': 6}],
+        'goal': 'Parabola: sai do chao, passa por cima do cano e volta ao chao no alvo (raizes 0 e 6).',
+        'dominio': 'R', 'imagem': '(-inf, 9]', 'solution': 'y=6*x-x^2',
+        'tip': 'Funcao quadratica: y = a*x^2 + b*x + c. Arqueiro e alvo estao no chao (y=0): sao as raizes 0 e 6. Com a<0 a parabola abre para baixo e o vertice (3, 9) e o ponto mais alto.',
+        'miss_hint': 'Raizes 0 e 6: y = -x*(x-6) = 6*x - x^2. O sinal negativo (a < 0) faz a flecha subir e depois descer.'
+    },
+    {
+        'id': '1-5', 'chapter': 1, 'tipo': 'Exponencial',
+        'archer': {'x': 0, 'y': 1}, 'target': {'x': 3, 'y': 8, 'r': 0.8},
+        'obstacles': [{'type': 'pipe', 'x': 2, 'y': 0, 'h': 2.5}],
+        'goal': 'A curva comeca em y=1 e a cada passo em x o valor e multiplicado pela base a em y=a^x.',
+        'dominio': 'R', 'imagem': '(0, +inf)', 'solution': 'y=2^x',
+        'tip': 'Funcao exponencial: y = a^x. Em x=0 vale sempre 1 e a cada passo em x o valor e multiplicado por a. Com a = 2: 1, 2, 4, 8.',
+        'miss_hint': 'Em y = a^x a flecha comeca em y=1. Teste qual base a faz y chegar a 8 quando x=3 (a*a*a = 8).'
+    },
+
+    # ================= CAPÍTULO 2: DERIVADAS =================
+    {
+        'id': '2-1', 'chapter': 2, 'tipo': 'Derivada de reta',
+        'archer': {'x': 0, 'y': 2}, 'target': {'x': 6, 'y': 2, 'r': 0.9},
+        'obstacles': [],
+        'goal': 'Se f(x) = 2*x, qual e a derivada f\'(x)? Digite y = f\'(x). A flecha segue a derivada.',
+        'dominio': 'R', 'imagem': 'R', 'solution': 'y=2',
+        'tip': 'A derivada de f(x) = 2*x e f\'(x) = 2. A derivada de uma reta e uma constante: a inclinacao da reta.',
+        'miss_hint': 'Derivada de a*x e a. Se f(x) = 2*x, entao f\'(x) = 2. Digite y=2.'
+    },
+    {
+        'id': '2-2', 'chapter': 2, 'tipo': 'Derivada de quadrática',
+        'archer': {'x': 0, 'y': 0}, 'target': {'x': 5, 'y': 10, 'r': 0.9},
+        'obstacles': [{'type': 'pipe', 'x': 2, 'y': 0, 'h': 2.5}],
+        'goal': 'Se f(x) = x^2, qual e f\'(x)? A flecha deve subir passando por cima do cano.',
+        'dominio': 'R', 'imagem': 'R', 'solution': 'y=2*x',
+        'tip': 'Regra do tombo: derivada de x^n e n*x^(n-1). Para x^2, f\'(x) = 2*x. Em x=5, y=10.',
+        'miss_hint': 'Derivada de x^2 e 2*x. A reta y=2*x sai da origem e sobe 2 a cada 1 em x.'
+    },
+    {
+        'id': '2-3', 'chapter': 2, 'tipo': 'Derivada de cúbica',
+        'archer': {'x': 0, 'y': 0}, 'target': {'x': 1.5, 'y': 6.75, 'r': 0.9},
+        'obstacles': [{'type': 'pipe', 'x': 1.2, 'y': 0, 'h': 1.0}],
+        'goal': 'Se f(x) = x^3, qual e f\'(x)? A parabola da derivada precisa passar pelo alvo.',
+        'dominio': 'R', 'imagem': '[0, +inf)', 'solution': 'y=3*x^2',
+        'tip': 'Derivada de x^3 e 3*x^2. E uma parabola que abre para cima. Em x=1.5, y=6.75.',
+        'miss_hint': 'A derivada de x^3 e 3*x^2. Em x=1.5, 3*(1.5)^2 = 6.75. Digite y=3*x^2.'
+    },
+    {
+        'id': '2-4', 'chapter': 2, 'tipo': 'Derivada de afim',
+        'archer': {'x': 0, 'y': 3}, 'target': {'x': 4, 'y': 3, 'r': 0.9},
+        'obstacles': [],
+        'goal': 'Se f(x) = 3*x + 1, qual e f\'(x)? A derivada de uma afim e constante.',
+        'dominio': 'R', 'imagem': 'R', 'solution': 'y=3',
+        'tip': 'A derivada de a*x + b e a. O b desaparece. Se f(x) = 3*x + 1, entao f\'(x) = 3.',
+        'miss_hint': 'Derivada de 3*x + 1 e 3. O termo constante (1) some na derivada. Digite y=3.'
+    },
+    {
+        'id': '2-5', 'chapter': 2, 'tipo': 'Derivada de exponencial',
+        'archer': {'x': 0, 'y': 1}, 'target': {'x': 2, 'y': 7.4, 'r': 1.0},
+        'obstacles': [],
+        'goal': 'Se f(x) = e^x, qual e f\'(x)? A derivada da exponencial natural e ela mesma.',
+        'dominio': 'R', 'imagem': '(0, +inf)', 'solution': 'y=exp(x)',
+        'tip': 'A derivada de e^x e e^x. A funcao e sua propria derivada. No jogo, use exp(x) para e^x. Em x=2, y~7.39.',
+        'miss_hint': 'A derivada de e^x e e^x. Digite y=exp(x). Em x=2, exp(2) ~ 7.39.'
+    },
 ]
 
 START_TOL = 0.6
@@ -44,25 +126,67 @@ _UNARY_OPS = (ast.UAdd, ast.USub)
 _TOKEN_RE = re.compile(r'\d+\.?\d*|\.\d+|abs|exp|sqrt|sin|cos|tan|log|pi|e|x|\*\*|[-+*/%()]|\S')
 
 BG_MUNDO2 = None
+BG_PRATICA = None
 
-def load_bg_image(filename):
-    path = os.path.join(os.path.dirname(__file__), filename)
-    if os.path.exists(path):
-        try:
-            img = pygame.image.load(path).convert()
-            return pygame.transform.scale(img, (INTERNAL_W, INTERNAL_H))
-        except Exception as e:
-            return None
+# Variáveis globais para a câmera dinâmica
+CAMERA_UNIT = GAME_UNIT
+CAMERA_Y = GAME_Y
+CAMERA_X = GAME_X
+
+def load_bg_image(base_name):
+    extensions = ['.png', '.jpg', '.jpeg', '.webp', '.PNG', '.JPG']
+    for ext in extensions:
+        path = os.path.join(os.path.dirname(__file__), base_name + ext)
+        if os.path.exists(path):
+            try:
+                img = pygame.image.load(path).convert()
+                img_w, img_h = img.get_size()
+                scale = max(INTERNAL_W / img_w, INTERNAL_H / img_h)
+                new_w, new_h = int(img_w * scale), int(img_h * scale)
+                img = pygame.transform.smoothscale(img, (new_w, new_h))
+                final_img = pygame.Surface((INTERNAL_W, INTERNAL_H))
+                final_img.blit(img, ((INTERNAL_W - new_w) // 2, (INTERNAL_H - new_h) // 2))
+                return final_img
+            except Exception:
+                pass
     return None
 
-# --- GERADOR DE DESAFIOS ALEATÓRIOS ---
+def setup_camera(phase):
+    """Calcula o zoom e os deslocamentos para que o alvo E o personagem caibam na tela."""
+    global CAMERA_UNIT, CAMERA_Y, CAMERA_X
+    
+    # Pega a altura máxima que precisamos mostrar (alvo ou arqueiro)
+    max_y = max(phase['archer']['y'], phase['target']['y'] + phase['target']['r'])
+    max_x = max(phase['archer']['x'], phase['target']['x'] + phase['target']['r'])
+    
+    # Área útil da tela (deixa margem para o teclado virtual embaixo e painel em cima)
+    # O chão vai ficar em CAMERA_Y. Queremos que o topo da tela seja y=240 (para caber no painel)
+    # e o chão fique em y=280 (para não sumir atrás do teclado).
+    
+    area_h = 240 # Distância em pixels do topo do gráfico até o chão
+    area_w = 580 # Largura máxima em pixels
+    
+    # Calcula o GAME_UNIT ideal para caber a altura e a largura
+    unit_y = area_h / max(max_y, 1) if max_y > 0 else GAME_UNIT
+    unit_x = area_w / max(max_x, 1) if max_x > 0 else GAME_UNIT
+    
+    # Escolhe o menor para garantir que tudo caiba
+    CAMERA_UNIT = min(unit_y, unit_x, GAME_UNIT)
+    
+    # Posiciona o chão na parte de baixo, mas deixando espaço para o teclado virtual
+    CAMERA_Y = 280 
+    CAMERA_X = GAME_X
+    
+def world_to_px(x, y):
+    return (CAMERA_X + int(x * CAMERA_UNIT), CAMERA_Y - int(y * CAMERA_UNIT))
+
 def generate_random_phase(mode):
     if mode == 'funcoes':
         templates = [
-            {'tipo': 'Constante', 'goal': 'A flecha voa reta. Digite a altura como y=c.', 'solution': f'y={random.randint(1, 8)}'},
-            {'tipo': 'Linear', 'goal': 'A reta sai da origem. Digite y=a*x.', 'solution': f'y={random.randint(1, 3)}*x'},
-            {'tipo': 'Afim', 'goal': 'A reta sai de y=b. Digite y=a*x+b.', 'solution': f'y={random.choice([0.5, 1, 1.5])}*x+{random.randint(1, 4)}'},
-            {'tipo': 'Quadrática', 'goal': 'Uma parabola. Digite y=a*x^2+b*x+c.', 'solution': f'y={random.randint(1,2)}*x^2-{random.randint(2,4)}*x+{random.randint(1,3)}'},
+            {'tipo': 'Constante', 'goal': 'A flecha voa reta. Digite a altura como y=c.', 'solution': f'y={random.randint(2, 10)}'},
+            {'tipo': 'Linear', 'goal': 'A reta sai da origem. Digite y=a*x.', 'solution': f'y={random.randint(1, 2)}*x'},
+            {'tipo': 'Afim', 'goal': 'A reta sai de y=b. Digite y=a*x+b.', 'solution': f'y={random.choice([0.5, 1])}*x+{random.randint(1, 5)}'},
+            {'tipo': 'Quadrática', 'goal': 'Uma parabola. Digite y=a*x^2+b*x+c.', 'solution': f'y={random.randint(1,2)}*x^2-{random.randint(2,4)}*x+{random.randint(2,5)}'},
             {'tipo': 'Exponencial', 'goal': 'Uma curva exponencial. Digite y=a^x.', 'solution': f'y={random.choice([2, 3])}^x'}
         ]
     else:
@@ -76,17 +200,13 @@ def generate_random_phase(mode):
     tmpl = random.choice(templates)
     f_compiled, _ = compile_expr(tmpl['solution'].replace('y=', ''))
     
-    # Sorteia um X e calcula o Y do alvo para a função sorteada
-    x_target = random.randint(2, 6)
+    x_target = random.randint(3, 7)
     y_target = f_compiled(x_target) if f_compiled else 5
     
-    # Ajusta limites de segurança para o alvo não sair da tela
-    if y_target is None or y_target < 1 or y_target > 12:
-        x_target = 3
-        y_target = f_compiled(x_target) if f_compiled else 3
-        if y_target is None or y_target < 1 or y_target > 12:
-            y_target = 5
-    
+    if y_target is None or y_target < 1 or y_target > 20:
+        x_target = 4
+        y_target = f_compiled(x_target) if f_compiled else 4
+        
     phase = {
         'id': 'PRATICA', 'chapter': 0, 'tipo': tmpl['tipo'],
         'archer': {'x': 0, 'y': f_compiled(0) if f_compiled and f_compiled(0) is not None else 0},
@@ -103,7 +223,6 @@ def generate_random_phase(mode):
         
     return phase
 
-
 def normalize_expr(text):
     s = text.strip().lower().replace(' ', '').replace(',', '.').replace('^', '**')
     tokens = _TOKEN_RE.findall(s)
@@ -119,7 +238,6 @@ def normalize_expr(text):
         out.append(tok)
     return ''.join(out)
 
-
 def _validate(node):
     if isinstance(node, ast.Expression): return _validate(node.body)
     if isinstance(node, ast.Constant): return isinstance(node.value, (int, float)) and not isinstance(node.value, bool)
@@ -129,11 +247,9 @@ def _validate(node):
     if isinstance(node, ast.Call): return (isinstance(node.func, ast.Name) and node.func.id in ALLOWED_FUNCS and len(node.args) == 1 and not node.keywords and _validate(node.args[0]))
     return False
 
-
 class _ToFloat(ast.NodeTransformer):
     def visit_Constant(self, node):
         return ast.copy_location(ast.Constant(float(node.value)), node)
-
 
 def compile_expr(text):
     expr = normalize_expr(text)
@@ -154,13 +270,11 @@ def compile_expr(text):
 
     return f, None
 
-
 def hits_obstacle(obs, x, y):
     if obs['type'] == 'pipe':
-        return (obs['x'] - 2 / GAME_UNIT <= x <= obs['x'] + 18 / GAME_UNIT and
-                obs['y'] <= y <= obs['y'] + obs['h'] + 8 / GAME_UNIT)
+        return (obs['x'] - 2 / CAMERA_UNIT <= x <= obs['x'] + 18 / CAMERA_UNIT and
+                obs['y'] <= y <= obs['y'] + obs['h'] + 8 / CAMERA_UNIT)
     return False
-
 
 def evaluate_shot(phase, text, step=0.02):
     ax, ay = phase['archer']['x'], phase['archer']['y']
@@ -192,39 +306,51 @@ def evaluate_shot(phase, text, step=0.02):
     if yt is not None and yt > ty + r: return miss('high', tx + 2, f"Passou por CIMA. Diminua a altura.", f)
     return miss('high', tx + 2, "A flecha nao acertou o alvo.", f)
 
-
 def phases_for(chapter): return [p for p in PHASES if p['chapter'] == chapter]
 def has_phases(chapter): return bool(phases_for(chapter))
 def stars_for(errors): return 3 if errors == 0 else 2 if errors <= 2 else 1
-def world_to_px(x, y): return (GAME_X + int(x * GAME_UNIT), GAME_Y - int(y * GAME_UNIT))
-
 
 def draw_grid_overlay(surface):
     overlay = pygame.Surface((INTERNAL_W, INTERNAL_H), pygame.SRCALPHA)
+    # A grade agora também usa a câmera dinâmica
     for gx in range(0, 22):
         px, _ = world_to_px(gx, 0)
-        pygame.draw.line(overlay, (255, 255, 255, 60), (px, 0), (px, GAME_Y), 1)
-    for gy in range(0, 11):
+        pygame.draw.line(overlay, (255, 255, 255, 60), (px, 0), (px, CAMERA_Y), 1)
+    for gy in range(0, 16):
         _, py = world_to_px(0, gy)
-        pygame.draw.line(overlay, (255, 255, 255, 60), (GAME_X, py), (INTERNAL_W, py), 1)
+        pygame.draw.line(overlay, (255, 255, 255, 60), (CAMERA_X, py), (INTERNAL_W, py), 1)
     _, y0 = world_to_px(0, 0)
-    pygame.draw.line(overlay, (255, 255, 255, 180), (GAME_X, y0), (INTERNAL_W, y0), 2)
-    pygame.draw.line(overlay, (255, 255, 255, 180), (GAME_X, 0), (GAME_X, y0), 2)
+    pygame.draw.line(overlay, (255, 255, 255, 180), (CAMERA_X, y0), (INTERNAL_W, y0), 2)
+    pygame.draw.line(overlay, (255, 255, 255, 180), (CAMERA_X, 0), (CAMERA_X, y0), 2)
     surface.blit(overlay, (0, 0))
 
-
 def draw_mario_bg(surface, chapter_num):
-    global BG_MUNDO2
-    if chapter_num == 2 or chapter_num == 0: # 0 = Praticar
-        if BG_MUNDO2 is None: BG_MUNDO2 = load_bg_image('bg_mundo2.png')
+    global BG_MUNDO2, BG_PRATICA
+    
+    if chapter_num == 0:
+        if BG_PRATICA is None: 
+            BG_PRATICA = load_bg_image('bg_pratica')
+        if BG_PRATICA is not None:
+            surface.blit(BG_PRATICA, (0, 0))
+            draw_grid_overlay(surface)
+            ground_pal = {'L': MARIO_GROUND_LIGHT, 'D': MARIO_GROUND_MAIN}
+            for x in range(0, INTERNAL_W, 32):
+                for y in range(CAMERA_Y, INTERNAL_H, 32):
+                    draw_sprite(surface, MARIO_GROUND, x, y, ground_pal, scale=2)
+            pygame.draw.line(surface, (0, 0, 0), (0, CAMERA_Y), (INTERNAL_W, CAMERA_Y), 3)
+            return
+
+    if chapter_num == 2:
+        if BG_MUNDO2 is None: 
+            BG_MUNDO2 = load_bg_image('bg_mundo2')
         if BG_MUNDO2 is not None:
             surface.blit(BG_MUNDO2, (0, 0))
             draw_grid_overlay(surface)
             ground_pal = {'L': MARIO_GROUND_LIGHT, 'D': MARIO_GROUND_MAIN}
             for x in range(0, INTERNAL_W, 32):
-                for y in range(GAME_Y, INTERNAL_H, 32):
+                for y in range(CAMERA_Y, INTERNAL_H, 32):
                     draw_sprite(surface, MARIO_GROUND, x, y, ground_pal, scale=2)
-            pygame.draw.line(surface, (0, 0, 0), (0, GAME_Y), (INTERNAL_W, GAME_Y), 3)
+            pygame.draw.line(surface, (0, 0, 0), (0, CAMERA_Y), (INTERNAL_W, CAMERA_Y), 3)
             return
 
     surface.fill(MARIO_SKY)
@@ -232,38 +358,36 @@ def draw_mario_bg(surface, chapter_num):
         pygame.draw.rect(surface, (255, 255, 255), (cx, cy, 60, 20))
         pygame.draw.rect(surface, (255, 255, 255), (cx + 10, cy - 10, 40, 20))
         pygame.draw.rect(surface, (255, 255, 255), (cx + 20, cy - 20, 20, 20))
-    for bx, by in [(20, GAME_Y - 30), (240, GAME_Y - 40), (500, GAME_Y - 24)]:
+    for bx, by in [(20, CAMERA_Y - 30), (240, CAMERA_Y - 40), (500, CAMERA_Y - 24)]:
         pygame.draw.rect(surface, MARIO_PIPE_GREEN, (bx, by, 80, 40))
         pygame.draw.circle(surface, MARIO_PIPE_GREEN, (bx + 20, by), 20)
         pygame.draw.circle(surface, MARIO_PIPE_GREEN, (bx + 60, by), 20)
         pygame.draw.circle(surface, MARIO_PIPE_GREEN, (bx + 40, by - 20), 30)
     for gx in range(0, 22):
         px, _ = world_to_px(gx, 0)
-        pygame.draw.line(surface, (150, 180, 240), (px, 0), (px, GAME_Y), 1)
-    for gy in range(0, 11):
+        pygame.draw.line(surface, (150, 180, 240), (px, 0), (px, CAMERA_Y), 1)
+    for gy in range(0, 16):
         _, py = world_to_px(0, gy)
-        pygame.draw.line(surface, (150, 180, 240), (GAME_X, py), (INTERNAL_W, py), 1)
+        pygame.draw.line(surface, (150, 180, 240), (CAMERA_X, py), (INTERNAL_W, py), 1)
     _, y0 = world_to_px(0, 0)
-    pygame.draw.line(surface, (80, 80, 80), (GAME_X, y0), (INTERNAL_W, y0), 3)
-    pygame.draw.line(surface, (80, 80, 80), (GAME_X, 0), (GAME_X, y0), 3)
+    pygame.draw.line(surface, (80, 80, 80), (CAMERA_X, y0), (INTERNAL_W, y0), 3)
+    pygame.draw.line(surface, (80, 80, 80), (CAMERA_X, 0), (CAMERA_X, y0), 3)
     ground_pal = {'L': MARIO_GROUND_LIGHT, 'D': MARIO_GROUND_MAIN}
     for x in range(0, INTERNAL_W, 32):
-        for y in range(GAME_Y, INTERNAL_H, 32):
+        for y in range(CAMERA_Y, INTERNAL_H, 32):
             draw_sprite(surface, MARIO_GROUND, x, y, ground_pal, scale=2)
-    pygame.draw.line(surface, (0, 0, 0), (0, GAME_Y), (INTERNAL_W, GAME_Y), 3)
-
+    pygame.draw.line(surface, (0, 0, 0), (0, CAMERA_Y), (INTERNAL_W, CAMERA_Y), 3)
 
 def draw_obstacle(surface, obs):
     px, py = world_to_px(obs['x'], obs['y'])
     if obs['type'] == 'pipe':
-        pipe_w = 32
-        pipe_h = int(obs['h'] * GAME_UNIT)
+        pipe_w = int(16 * CAMERA_UNIT / 15)
+        pipe_h = int(obs['h'] * CAMERA_UNIT)
         pygame.draw.rect(surface, MARIO_PIPE_GREEN, (px, py - pipe_h, pipe_w, pipe_h))
         pygame.draw.rect(surface, MARIO_PIPE_DARK, (px + pipe_w - 8, py - pipe_h, 8, pipe_h))
         pygame.draw.rect(surface, MARIO_PIPE_GREEN, (px - 4, py - pipe_h - 16, pipe_w + 8, 16))
         pygame.draw.rect(surface, MARIO_PIPE_DARK, (px + pipe_w - 4, py - pipe_h - 16, 8, 16))
         pygame.draw.rect(surface, (0, 0, 0), (px - 4, py - pipe_h - 16, pipe_w + 8, 16), 1)
-
 
 def draw_arrow(surface, f, x, y):
     fx, fy = world_to_px(x, y)
@@ -271,7 +395,7 @@ def draw_arrow(surface, f, x, y):
     if f is not None:
         y1, y2 = f(x - 0.05), f(x + 0.05)
         if y1 is not None and y2 is not None:
-            dx, dy = 0.1 * GAME_UNIT, -(y2 - y1) * GAME_UNIT
+            dx, dy = 0.1 * CAMERA_UNIT, -(y2 - y1) * CAMERA_UNIT
             n = math.hypot(dx, dy)
             if n > 0.001: ux, uy = dx / n, dy / n
     tail = (fx - ux * 12, fy - uy * 12)
@@ -281,7 +405,6 @@ def draw_arrow(surface, f, x, y):
     pygame.draw.polygon(surface, (40, 40, 40), [(tip[0] + ux * 6, tip[1] + uy * 6),
                                                 (tip[0] + px_ * 4, tip[1] + py_ * 4),
                                                 (tip[0] - px_ * 4, tip[1] - py_ * 4)])
-
 
 def draw_trail(surface, f, x_start, x_end, color):
     if f is None or x_end <= x_start: return
@@ -295,7 +418,6 @@ def draw_trail(surface, f, x_start, x_end, color):
             prev = p
         else: prev = None
         x += TRAIL_STEP
-
 
 def new_anim():
     return {'phase': 'idle', 'pull': 0, 'start': 0, 'arrow_x': 0, 'arrow_y': 0, 'hit': False, 'impact_start': 0}
@@ -313,7 +435,6 @@ def wrap_lines(text, size, max_w):
             current = w + " "
     lines.append(current.strip())
     return lines
-
 
 def draw_cartesian_graph(surface, phase, f, x_end, hit, input_text):
     surface.fill((15, 15, 25))
@@ -384,10 +505,52 @@ def draw_cartesian_graph(surface, phase, f, x_end, hit, input_text):
               gx0, gy0 + gh + 130, 20, (220, 220, 240))
     draw_text(surface, "Clique ou ENTER para continuar", gx0 + gw // 2, 460, 22, (200, 200, 200), center=True)
 
+def draw_pause_menu(surface, mouse_pos, scale, is_practice=False):
+    overlay = pygame.Surface((INTERNAL_W, INTERNAL_H), pygame.SRCALPHA)
+    overlay.fill((0, 0, 0, 180))
+    surface.blit(overlay, (0, 0))
+    
+    draw_text(surface, "JOGO PAUSADO", INTERNAL_W // 2, 120, 48, (255, 255, 255), center=True)
+    
+    mx, my = mouse_pos[0] // scale, mouse_pos[1] // scale
+    
+    if is_practice:
+        btn_continuar = (INTERNAL_W // 2 - 150, 220, 300, 50)
+        btn_novo = (INTERNAL_W // 2 - 150, 290, 300, 50)
+        btn_sair = (INTERNAL_W // 2 - 150, 360, 300, 50)
+        
+        hover_cont = btn_continuar[0] <= mx <= btn_continuar[0] + btn_continuar[2] and btn_continuar[1] <= my <= btn_continuar[1] + btn_continuar[3]
+        hover_novo = btn_novo[0] <= mx <= btn_novo[0] + btn_novo[2] and btn_novo[1] <= my <= btn_novo[1] + btn_novo[3]
+        hover_sair = btn_sair[0] <= mx <= btn_sair[0] + btn_sair[2] and btn_sair[1] <= my <= btn_sair[1] + btn_sair[3]
+        
+        draw_mc_button(surface, *btn_continuar, "CONTINUAR", (69, 123, 157), hover_cont)
+        draw_mc_button(surface, *btn_novo, "NOVO DESAFIO", (200, 120, 40), hover_novo)
+        draw_mc_button(surface, *btn_sair, "SAIR PARA O MENU", (200, 50, 50), hover_sair)
+        
+        if pygame.mouse.get_pressed()[0]:
+            if hover_cont: return "continuar"
+            if hover_novo: return "novo"
+            if hover_sair: return "sair"
+    else:
+        btn_continuar = (INTERNAL_W // 2 - 150, 220, 300, 50)
+        btn_sair = (INTERNAL_W // 2 - 150, 290, 300, 50)
+        
+        hover_cont = btn_continuar[0] <= mx <= btn_continuar[0] + btn_continuar[2] and btn_continuar[1] <= my <= btn_continuar[1] + btn_continuar[3]
+        hover_sair = btn_sair[0] <= mx <= btn_sair[0] + btn_sair[2] and btn_sair[1] <= my <= btn_sair[1] + btn_sair[3]
+        
+        draw_mc_button(surface, *btn_continuar, "CONTINUAR", (69, 123, 157), hover_cont)
+        draw_mc_button(surface, *btn_sair, "SAIR PARA SELECAO", (200, 50, 50), hover_sair)
+        
+        if pygame.mouse.get_pressed()[0]:
+            if hover_cont: return "continuar"
+            if hover_sair: return "sair"
+            
+    return None
 
-# --- MODO PRATICAR (LOOP INFINITO) ---
 def play_practice(window, surface, clock, mode):
     phase = generate_random_phase(mode)
+    setup_camera(phase) # <--- Ativa o zoom
+    
     input_text = "y="
     show_preview = False
     anim = new_anim()
@@ -396,10 +559,38 @@ def play_practice(window, surface, clock, mode):
     attempts = MAX_ATTEMPTS
     shot = None
     show_graph = False
+    paused = False
 
     while True:
         clock.tick(60)
         now = pygame.time.get_ticks()
+        mouse_pos = pygame.mouse.get_pos()
+        
+        if paused:
+            action = draw_pause_menu(surface, mouse_pos, SCALE, is_practice=True)
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT: return 'quit'
+                if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+                    paused = False
+            if action == "continuar":
+                paused = False
+            elif action == "novo":
+                phase = generate_random_phase(mode)
+                setup_camera(phase) # <--- Ativa o zoom
+                input_text = "y="
+                attempts, result_msg, show_preview = MAX_ATTEMPTS, None, False
+                anim = new_anim()
+                shot = None
+                show_graph = False
+                paused = False
+            elif action == "sair":
+                return 'menu'
+                
+            scaled = pygame.transform.scale(surface, (WINDOW_W, WINDOW_H))
+            window.blit(scaled, (0, 0))
+            pygame.display.flip()
+            continue
+
         continue_key = False
         click_pos = None
         can_type = anim['phase'] == 'idle' and result_msg is None and not show_graph
@@ -409,7 +600,8 @@ def play_practice(window, surface, clock, mode):
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 click_pos = (event.pos[0] // SCALE, event.pos[1] // SCALE)
             if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_ESCAPE: return 'menu'
+                if event.key == pygame.K_ESCAPE:
+                    paused = True
                 if event.key == pygame.K_RETURN:
                     if show_graph: continue_key = True
                     elif result_msg is not None: show_graph = True
@@ -428,15 +620,14 @@ def play_practice(window, surface, clock, mode):
             draw_cartesian_graph(surface, phase, shot['f'] if shot else None, anim['arrow_x'], anim['hit'], input_text)
             if click_pos or continue_key:
                 if anim['hit']:
-                    # GERA UM NOVO DESAFIO ALEATÓRIO
                     phase = generate_random_phase(mode)
+                    setup_camera(phase) # <--- Ativa o zoom
                     input_text = "y="
                     attempts, result_msg, show_preview = MAX_ATTEMPTS, None, False
                     anim = new_anim()
                     shot = None
                     show_graph = False
                 elif attempts <= 0:
-                    # Se errar tudo, reinicia o mesmo desafio
                     attempts, result_msg, show_preview = MAX_ATTEMPTS, None, False
                     anim = new_anim()
                     shot = None
@@ -450,7 +641,7 @@ def play_practice(window, surface, clock, mode):
             pygame.display.flip()
             continue
 
-        draw_mario_bg(surface, 0) # 0 desenha o mundo 2 como fundo
+        draw_mario_bg(surface, 0)
         for obs in phase['obstacles']: draw_obstacle(surface, obs)
 
         ax, ay = world_to_px(phase['archer']['x'], phase['archer']['y'])
@@ -465,7 +656,7 @@ def play_practice(window, surface, clock, mode):
                 x_prev = phase['archer']['x']
                 while x_prev <= phase['target']['x'] + 1:
                     y_prev = f_prev(x_prev)
-                    if y_prev is not None and -0.5 < y_prev < 10.5:
+                    if y_prev is not None and -0.5 < y_prev < 20:
                         sx, sy = world_to_px(x_prev, y_prev)
                         pygame.draw.circle(surface, PREVIEW_COLOR, (sx, sy), 2)
                     x_prev += 0.15
@@ -586,12 +777,13 @@ def play_practice(window, surface, clock, mode):
         pygame.display.flip()
 
 
-# O SEU PLAY ORIGINAL (MODO HISTÓRIA) FICA AQUI EMBAIXO INTACTO
 def play(window, surface, clock, chapter_num):
     phases = phases_for(chapter_num)
     if not phases: return 'menu'
     phase_idx = 0
     phase = phases[phase_idx]
+    setup_camera(phase) # <--- Ativa o zoom
+    
     input_text = "y="
     show_preview = False
     anim = new_anim()
@@ -601,10 +793,29 @@ def play(window, surface, clock, chapter_num):
     errors = 0
     shot = None
     show_graph = False
+    paused = False
 
     while True:
         clock.tick(60)
         now = pygame.time.get_ticks()
+        mouse_pos = pygame.mouse.get_pos()
+
+        if paused:
+            action = draw_pause_menu(surface, mouse_pos, SCALE, is_practice=False)
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT: return 'quit'
+                if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+                    paused = False
+            if action == "continuar":
+                paused = False
+            elif action == "sair":
+                return 'menu'
+                
+            scaled = pygame.transform.scale(surface, (WINDOW_W, WINDOW_H))
+            window.blit(scaled, (0, 0))
+            pygame.display.flip()
+            continue
+
         continue_key = False
         click_pos = None
         can_type = anim['phase'] == 'idle' and result_msg is None and not show_graph
@@ -614,7 +825,8 @@ def play(window, surface, clock, chapter_num):
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 click_pos = (event.pos[0] // SCALE, event.pos[1] // SCALE)
             if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_ESCAPE: return 'menu'
+                if event.key == pygame.K_ESCAPE:
+                    paused = True
                 if event.key == pygame.K_RETURN:
                     if show_graph: continue_key = True
                     elif result_msg is not None: show_graph = True
@@ -639,6 +851,7 @@ def play(window, surface, clock, chapter_num):
                         return 'menu'
                     phase_idx += 1
                     phase = phases[phase_idx]
+                    setup_camera(phase) # <--- Ativa o zoom
                     input_text = "y="
                     attempts, result_msg, show_preview = MAX_ATTEMPTS, None, False
                     anim = new_anim()
@@ -668,7 +881,7 @@ def play(window, surface, clock, chapter_num):
                 x_prev = phase['archer']['x']
                 while x_prev <= phase['target']['x'] + 1:
                     y_prev = f_prev(x_prev)
-                    if y_prev is not None and -0.5 < y_prev < 10.5:
+                    if y_prev is not None and -0.5 < y_prev < 20:
                         sx, sy = world_to_px(x_prev, y_prev)
                         pygame.draw.circle(surface, PREVIEW_COLOR, (sx, sy), 2)
                     x_prev += 0.15

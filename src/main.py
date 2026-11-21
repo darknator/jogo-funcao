@@ -31,6 +31,7 @@ def main():
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     action = menumod.hit_test(event.pos, SCALE, is_main_menu=True)
                     if action == "jogar":
+                        practice_mode = None # LIMPA AQUI
                         state = 'chapter_select'
                     elif action == "praticar":
                         state = 'practice_select'
@@ -45,6 +46,7 @@ def main():
                     pygame.quit()
                     sys.exit()
                 if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+                    practice_mode = None # LIMPA AQUI TBM
                     state = 'main_menu'
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     mx, my = event.pos[0] // SCALE, event.pos[1] // SCALE
@@ -55,6 +57,7 @@ def main():
                         practice_mode = 'derivadas'
                         state = 'game'
                     elif btn_voltar[0] <= mx <= btn_voltar[0] + btn_voltar[2] and btn_voltar[1] <= my <= btn_voltar[1] + btn_voltar[3]:
+                        practice_mode = None
                         state = 'main_menu'
 
         elif state == 'learn':
@@ -81,7 +84,6 @@ def main():
                     state = 'main_menu'
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     mx, my = event.pos[0] // SCALE, event.pos[1] // SCALE
-                    # Checa o botão voltar
                     if btn_voltar[0] <= mx <= btn_voltar[0] + btn_voltar[2] and btn_voltar[1] <= my <= btn_voltar[1] + btn_voltar[3]:
                         state = 'main_menu'
                     else:
@@ -90,6 +92,7 @@ def main():
                             chapter is not None and (chapter - 1) in save_data['chapters_completed'])
                         if chapter is not None and unlocked and gamemod.has_phases(chapter):
                             current_chapter = chapter
+                            practice_mode = None # GARANTE QUE É NONE
                             state = 'game'
 
         elif state == 'game':

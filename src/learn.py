@@ -13,7 +13,13 @@ TOPICS_DATA = [
             "No jogo, a flecha segue a função y = f(x). O 'x' é a distância horizontal e o 'y' é a altura da flecha naquele ponto.\n\n"
             "Se y = 3 (função constante), a flecha voa reta na altura 3.\n"
             "Se y = 2*x + 1 (função afim), a flecha sobe 2 unidades para cada 1 unidade que avança.\n\n"
-            "Dica: Use o botão 'PREVISÃO' no jogo para ver o desenho da sua função antes de atirar!"
+            "Dica: Use o botão 'PREVISÃO' no jogo para ver o desenho da sua função antes de atirar!\n\n"
+            "As funções podem ser classificadas em vários tipos. As mais comuns no nosso jogo são:\n"
+            "- Constantes: y = c\n"
+            "- Lineares: y = a*x\n"
+            "- Afins: y = a*x + b\n"
+            "- Quadráticas: y = a*x^2 + b*x + c\n"
+            "- Exponenciais: y = a^x"
         )
     },
     {
@@ -29,7 +35,8 @@ TOPICS_DATA = [
             "- Derivada de a*x: a\n"
             "- Derivada de x^n: n*x^(n-1)\n"
             "- Derivada de e^x: e^x\n\n"
-            "Exemplo: se f(x) = x^2, então f'(x) = 2*x. A flecha vai seguir a reta y = 2*x."
+            "Exemplo prático: se f(x) = x^2, então f'(x) = 2*x. A flecha vai seguir a reta y = 2*x.\n\n"
+            "Outro exemplo: se f(x) = 5*x^3, o expoente 3 desce multiplicando o 5 (5*3 = 15) e o expoente diminui em 1, ficando 2. Logo, f'(x) = 15*x^2."
         )
     },
     {
@@ -39,7 +46,8 @@ TOPICS_DATA = [
             "O limite é o valor para o qual a função 'tende' quando x se aproxima de um certo número.\n\n"
             "Imagine que você caminha em direção a uma parede. Você chega muito perto, mas não atravessa. O limite é a parede.\n\n"
             "No futuro do jogo, os alvos começarão a se mover. Para acertar, você não vai mirar onde ele está, mas sim onde ele VAI ESTAR (o limite da trajetória).\n\n"
-            "Limites também ajudam a entender o que acontece quando as coisas explodem (tendem ao infinito)."
+            "Limites também ajudam a entender o que acontece quando as coisas explodem (tendem ao infinito).\n\n"
+            "Formalmente, dizemos que o limite de f(x) quando x tende a 'a' é L se, à medida que x se aproxima de 'a', os valores de f(x) se aproximam de L."
         )
     },
     {
@@ -49,7 +57,8 @@ TOPICS_DATA = [
             "A integral é o cálculo da área sob a curva de uma função.\n\n"
             "Imagine pintar todo o espaço entre a trajetória da flecha e o chão. A integral calcula esse espaço.\n\n"
             "Na prática, a integral acumula coisas. Se a função for a velocidade de um carro, a integral da velocidade pelo tempo é a distância total percorrida.\n\n"
-            "A integral definida vai do ponto A ao ponto B (como do arqueiro até o alvo). A integral indefinida gera uma nova função."
+            "A integral definida vai do ponto A ao ponto B (como do arqueiro até o alvo). A integral indefinida gera uma nova função.\n\n"
+            "No nosso jogo, se a flecha faz uma parábola, a integral definida entre o arqueiro e o alvo nos daria a área exata debaixo daquela curva."
         )
     }
 ]
@@ -75,8 +84,11 @@ def wrap_text(text, font, max_width):
             lines.append(current_line)
     return lines
 
+# Variável global para guardar a rolagem do texto
+scroll_offset = 0
 
 def draw(surface, state, mouse_pos, scale):
+    global scroll_offset
     surface.fill(UI_BG)
     for y in range(0, 480, 16):
         for x in range(0, 640, 16):
@@ -109,6 +121,7 @@ def draw(surface, state, mouse_pos, scale):
 
             if pygame.mouse.get_pressed()[0] and hover:
                 action = i
+                scroll_offset = 0 # Reseta o scroll ao entrar
                 pygame.time.wait(200)
 
         # BOTÃO VOLTAR
@@ -133,18 +146,45 @@ def draw(surface, state, mouse_pos, scale):
 
         draw_text(surface, topic["title"].upper(), INTERNAL_W // 2, 40, 44, UI_GOLD, center=True)
 
-        pygame.draw.rect(surface, (240, 240, 240), (30, 80, 580, 320))
-        pygame.draw.rect(surface, (100, 100, 100), (30, 80, 580, 320), 3)
+        # Caixa de texto
+        box_rect = pygame.Rect(30, 80, 580, 320)
+        pygame.draw.rect(surface, (240, 240, 240), box_rect)
+        pygame.draw.rect(surface, (100, 100, 100), box_rect, 3)
 
+        # Desenha o texto com rolagem
         font_content = pygame.font.SysFont('Arial', 22)
         lines = wrap_text(topic["content"], font_content, 540)
-
-        y_offset = 100
+        
+        y_offset = 100 - scroll_offset
         for line in lines:
-            if y_offset > 380: break
-            surf = font_content.render(line, True, (30, 30, 30))
-            surface.blit(surf, (50, y_offset))
+            # Só desenha se a linha estiver dentro da caixa visível
+            if y_offset > 70 and y_offset < 390:
+                surf = font_content.render(line, True, (30, 30, 30))
+                surface.blit(surf, (50, y_offset))
             y_offset += 28
+
+        # Detecta input do teclado (Setas) para rolar
+        keys = pygame.key.get_pressed()
+        if keys[pygame.K_DOWN]:
+            scroll_offset += 5
+        if keys[pygame.K_UP]:
+            scroll_offset -= 5
+
+        # Detecta rolagem do mouse (Roda)
+        for event in pygame.event.get():
+            if event.type == pygame.MOUSEWHEEL:
+                scroll_offset -= event.y * 20
+            if event.type == pygame.QUIT:
+                return "quit"
+            if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+                return "voltar_lista"
+
+        # Limita o scroll (não deixa passar do topo ou do fim)
+        max_scroll = max(0, len(lines) * 28 - 300)
+        if scroll_offset > max_scroll:
+            scroll_offset = max_scroll
+        if scroll_offset < 0:
+            scroll_offset = 0
 
         # BOTÃO VOLTAR A LISTA
         btn_voltar = (INTERNAL_W // 2 - 100, 410, 200, 50)
