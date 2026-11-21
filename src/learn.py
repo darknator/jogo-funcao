@@ -17,6 +17,22 @@ TOPICS_DATA = [
         )
     },
     {
+        "title": "Derivadas",
+        "desc": "A inclinação da trajetória em cada ponto.",
+        "content": (
+            "A derivada mede a taxa de variação: quão rápido o 'y' muda quando o 'x' muda.\n\n"
+            "Se a função é a sua trajetória, a derivada é a INCLINAÇÃO da flecha naquele exato momento.\n\n"
+            "No capítulo 2 do jogo, você recebe uma função f(x) e precisa digitar a derivada f'(x). A flecha segue a curva da derivada.\n\n"
+            "Regras básicas:\n"
+            "- Derivada de constante: 0\n"
+            "- Derivada de x: 1\n"
+            "- Derivada de a*x: a\n"
+            "- Derivada de x^n: n*x^(n-1)\n"
+            "- Derivada de e^x: e^x\n\n"
+            "Exemplo: se f(x) = x^2, então f'(x) = 2*x. A flecha vai seguir a reta y = 2*x."
+        )
+    },
+    {
         "title": "Limites",
         "desc": "Para onde a função está indo?",
         "content": (
@@ -24,17 +40,6 @@ TOPICS_DATA = [
             "Imagine que você caminha em direção a uma parede. Você chega muito perto, mas não atravessa. O limite é a parede.\n\n"
             "No futuro do jogo, os alvos começarão a se mover. Para acertar, você não vai mirar onde ele está, mas sim onde ele VAI ESTAR (o limite da trajetória).\n\n"
             "Limites também ajudam a entender o que acontece quando as coisas explodem (tendem ao infinito)."
-        )
-    },
-    {
-        "title": "Derivadas",
-        "desc": "A velocidade instantânea e a inclinação.",
-        "content": (
-            "A derivada mede a taxa de variação. Ou seja, quão rápido o 'y' muda quando o 'x' muda.\n\n"
-            "Se a função for a sua trajetória, a derivada é a INCLINAÇÃO da flecha naquele exato momento.\n\n"
-            "Quando a flecha está subindo, a derivada é positiva. Quando está caindo, negativa.\n"
-            "No topo da curva (o vértice da parábola), a derivada é zero (a flecha fica paralela ao chão por um instante).\n\n"
-            "Na física, a derivada da posição é a velocidade, e a derivada da velocidade é a aceleração."
         )
     },
     {
@@ -50,7 +55,6 @@ TOPICS_DATA = [
 ]
 
 
-
 def wrap_text(text, font, max_width):
     lines = []
     for paragraph in text.split('\n'):
@@ -64,55 +68,54 @@ def wrap_text(text, font, max_width):
             if font.size(test_line)[0] < max_width:
                 current_line = test_line
             else:
-                lines.append(current_line)
+                if current_line.strip():
+                    lines.append(current_line)
                 current_line = word + " "
-        lines.append(current_line)
+        if current_line.strip():
+            lines.append(current_line)
     return lines
 
 
 def draw(surface, state, mouse_pos, scale):
-    """Retorna a ação 'voltar' ou 'detalhe_X' ou None"""
     surface.fill(UI_BG)
 
-    # Fundo texturizado sutil
-    for y in range(0, 240, 8):
-        for x in range(0, 320, 8):
-            if (x + y) % 16 == 0: pygame.draw.rect(surface, (40, 40, 40), (x, y, 4, 4))
+    for y in range(0, 480, 16):
+        for x in range(0, 640, 16):
+            if (x + y) % 32 == 0:
+                pygame.draw.rect(surface, (40, 40, 40), (x, y, 8, 8))
 
     if state == 'grid':
-        draw_text(surface, "APRENDER", INTERNAL_W // 2, 25, 24, UI_GOLD, center=True)
-        draw_text(surface, "Escolha um topico para estudar:", INTERNAL_W // 2, 45, 12, UI_TEXT, center=True)
+        draw_text(surface, "APRENDER", INTERNAL_W // 2, 50, 48, UI_GOLD, center=True)
+        draw_text(surface, "Escolha um topico para estudar:", INTERNAL_W // 2, 90, 24, UI_TEXT, center=True)
 
         mx, my = mouse_pos[0] // scale, mouse_pos[1] // scale
         action = None
 
         for i, topic in enumerate(TOPICS_DATA):
-            x = 10 + (i % 2) * 155
-            y = 65 + (i // 2) * 75
+            x = 20 + (i % 2) * 310
+            y = 130 + (i // 2) * 150
 
-            hover = x <= mx <= x + 145 and y <= my <= y + 65
+            hover = x <= mx <= x + 290 and y <= my <= y + 130
             color = (70, 70, 80) if hover else (50, 50, 60)
 
-            pygame.draw.rect(surface, color, (x, y, 145, 65))
-            pygame.draw.rect(surface, (150, 150, 160) if hover else (100, 100, 110), (x, y, 145, 65), 2)
+            pygame.draw.rect(surface, color, (x, y, 290, 130))
+            pygame.draw.rect(surface, (150, 150, 160) if hover else (100, 100, 110), (x, y, 290, 130), 3)
 
-            draw_text(surface, topic["title"], x + 72, y + 12, 16, (255, 255, 255), center=True)
+            draw_text(surface, topic["title"], x + 145, y + 24, 32, (255, 255, 255), center=True)
 
-
-            font_desc = pygame.font.SysFont('Arial', 9)
-            lines = wrap_text(topic["desc"], font_desc, 135)
+            font_desc = pygame.font.SysFont('Arial', 18)
+            lines = wrap_text(topic["desc"], font_desc, 270)
             for j, line in enumerate(lines[:3]):
-                draw_text(surface, line, x + 72, y + 32 + j * 12, 9, (200, 200, 200), center=True)
+                draw_text(surface, line, x + 145, y + 64 + j * 24, 18, (200, 200, 200), center=True)
 
-            draw_text(surface, "[ Clique para ler ]", x + 72, y + 55, 8, (255, 255, 150) if hover else (150, 150, 150),
-                      center=True)
+            draw_text(surface, "[ Clique para ler ]", x + 145, y + 110, 16,
+                      (255, 255, 150) if hover else (150, 150, 150), center=True)
 
             if pygame.mouse.get_pressed()[0] and hover:
                 action = i
                 pygame.time.wait(200)
 
-        draw_text(surface, "[ ESC ] Voltar ao Menu Principal", INTERNAL_W // 2, 225, 12, UI_TEXT, center=True)
-
+        draw_text(surface, "[ ESC ] Voltar ao Menu Principal", INTERNAL_W // 2, 450, 24, UI_TEXT, center=True)
 
         if action is not None:
             return action
@@ -120,27 +123,27 @@ def draw(surface, state, mouse_pos, scale):
             return "voltar"
 
     else:
-
+        if not (isinstance(state, int) and 0 <= state < len(TOPICS_DATA)):
+            return "voltar_lista"
         topic = TOPICS_DATA[state]
 
-        draw_text(surface, topic["title"].upper(), INTERNAL_W // 2, 20, 22, UI_GOLD, center=True)
+        draw_text(surface, topic["title"].upper(), INTERNAL_W // 2, 40, 44, UI_GOLD, center=True)
 
+        pygame.draw.rect(surface, (240, 240, 240), (30, 90, 580, 330))
+        pygame.draw.rect(surface, (100, 100, 100), (30, 90, 580, 330), 3)
 
-        pygame.draw.rect(surface, (240, 240, 240), (15, 45, 290, 165))
-        pygame.draw.rect(surface, (100, 100, 100), (15, 45, 290, 165), 2)
+        font_content = pygame.font.SysFont('Arial', 22)
+        lines = wrap_text(topic["content"], font_content, 540)
 
-
-        font_content = pygame.font.SysFont('Arial', 11)
-        lines = wrap_text(topic["content"], font_content, 270)
-
-        y_offset = 55
+        y_offset = 110
         for line in lines:
-            if y_offset > 195: break  # Não deixa o texto vazar do quadro
+            if y_offset > 400:
+                break
             surf = font_content.render(line, True, (30, 30, 30))
-            surface.blit(surf, (25, y_offset))
-            y_offset += 14
+            surface.blit(surf, (50, y_offset))
+            y_offset += 28
 
-        draw_text(surface, "[ ESC ] Voltar a lista", INTERNAL_W // 2, 225, 12, UI_TEXT, center=True)
+        draw_text(surface, "[ ESC ] Voltar a lista", INTERNAL_W // 2, 450, 24, UI_TEXT, center=True)
 
         if pygame.key.get_pressed()[pygame.K_ESCAPE]:
             pygame.time.wait(200)

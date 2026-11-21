@@ -1,4 +1,3 @@
-
 UI_BG = (30, 30, 30)
 UI_FACE = (112, 112, 112)
 UI_HIGHLIGHT = (168, 168, 168)
@@ -26,6 +25,11 @@ PALETTE = {
 }
 
 
-CHAPTER_NAMES = ["Funções", "Limites", "Derivadas", "Integrais"]
-CHAPTER_COLORS = [(69, 123, 157), (90, 143, 95), (231, 111, 81), (210, 160, 40)]
+CHAPTER_NAMES = ["Funções", "Derivadas"]
+CHAPTER_COLORS = [(69, 123, 157), (231, 111, 81)]
 BOW_LEVELS = [{'color': (139, 69, 19)}, {'color': (230, 220, 190)}, {'color': (180, 180, 195)}, {'color': (255, 200, 30)}, {'color': (150, 80, 220)}]
+
+TRAIL_COLOR = (255, 220, 100)
+TRAIL_COLOR_HIT = (42, 220, 143)
+TRAIL_COLOR_MISS = (230, 80, 70)
+PREVIEW_COLOR = (106, 76, 147)
