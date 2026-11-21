@@ -176,7 +176,7 @@ def setup_camera(phase):
     # Posiciona o chão na parte de baixo, mas deixando espaço para o teclado virtual
     CAMERA_Y = 280 
     CAMERA_X = GAME_X
-    
+
 def world_to_px(x, y):
     return (CAMERA_X + int(x * CAMERA_UNIT), CAMERA_Y - int(y * CAMERA_UNIT))
 
@@ -312,16 +312,31 @@ def stars_for(errors): return 3 if errors == 0 else 2 if errors <= 2 else 1
 
 def draw_grid_overlay(surface):
     overlay = pygame.Surface((INTERNAL_W, INTERNAL_H), pygame.SRCALPHA)
-    # A grade agora também usa a câmera dinâmica
-    for gx in range(0, 22):
+    
+    # Calcula até onde a grade precisa ir na tela (para cima e para a direita)
+    # Baseado no zoom atual (CAMERA_UNIT) e no tamanho da tela
+    max_x = int((INTERNAL_W - CAMERA_X) / CAMERA_UNIT) + 2
+    max_y = int(CAMERA_Y / CAMERA_UNIT) + 2
+    
+    # Desenha as linhas verticais (eixo X)
+    for gx in range(0, max_x):
         px, _ = world_to_px(gx, 0)
-        pygame.draw.line(overlay, (255, 255, 255, 60), (px, 0), (px, CAMERA_Y), 1)
-    for gy in range(0, 16):
+        # Só desenha se estiver dentro da tela
+        if px <= INTERNAL_W:
+            pygame.draw.line(overlay, (255, 255, 255, 60), (px, 0), (px, CAMERA_Y), 1)
+            
+    # Desenha as linhas horizontais (eixo Y)
+    for gy in range(0, max_y):
         _, py = world_to_px(0, gy)
-        pygame.draw.line(overlay, (255, 255, 255, 60), (CAMERA_X, py), (INTERNAL_W, py), 1)
+        # Só desenha se estiver dentro da tela (acima do chão)
+        if py >= 0 and py <= CAMERA_Y:
+            pygame.draw.line(overlay, (255, 255, 255, 60), (CAMERA_X, py), (INTERNAL_W, py), 1)
+            
+    # Desenha os eixos principais (X e Y) um pouco mais fortes
     _, y0 = world_to_px(0, 0)
     pygame.draw.line(overlay, (255, 255, 255, 180), (CAMERA_X, y0), (INTERNAL_W, y0), 2)
     pygame.draw.line(overlay, (255, 255, 255, 180), (CAMERA_X, 0), (CAMERA_X, y0), 2)
+    
     surface.blit(overlay, (0, 0))
 
 def draw_mario_bg(surface, chapter_num):
@@ -644,11 +659,13 @@ def play_practice(window, surface, clock, mode):
         draw_mario_bg(surface, 0)
         for obs in phase['obstacles']: draw_obstacle(surface, obs)
 
+        steve_scale = max(1, int(2 * (CAMERA_UNIT / GAME_UNIT)))
         ax, ay = world_to_px(phase['archer']['x'], phase['archer']['y'])
-        draw_sprite(surface, STEVE, ax - 12, ay - 16, scale=2)
+        draw_sprite(surface, STEVE, ax - 6 * steve_scale, ay - 8 * steve_scale, scale=steve_scale)
         draw_bow(surface, ax, ay, 0, anim['pull'] if anim['phase'] == 'pull' else 0)
+        target_scale = max(1, int(2 * (CAMERA_UNIT / GAME_UNIT)))
         tx, ty = world_to_px(phase['target']['x'], phase['target']['y'])
-        draw_sprite(surface, TARGET, tx - 16, ty - 16, scale=2)
+        draw_sprite(surface, TARGET, tx - 8 * target_scale, ty - 8 * target_scale, scale=target_scale)
 
         if show_preview and anim['phase'] == 'idle' and result_msg is None:
             f_prev, _ = compile_expr(input_text[2:])
@@ -869,11 +886,13 @@ def play(window, surface, clock, chapter_num):
 
         draw_mario_bg(surface, chapter_num)
         for obs in phase['obstacles']: draw_obstacle(surface, obs)
+        steve_scale = max(1, int(2 * (CAMERA_UNIT / GAME_UNIT)))
         ax, ay = world_to_px(phase['archer']['x'], phase['archer']['y'])
-        draw_sprite(surface, STEVE, ax - 12, ay - 16, scale=2)
+        draw_sprite(surface, STEVE, ax - 6 * steve_scale, ay - 8 * steve_scale, scale=steve_scale)
         draw_bow(surface, ax, ay, 0, anim['pull'] if anim['phase'] == 'pull' else 0)
+        target_scale = max(1, int(2 * (CAMERA_UNIT / GAME_UNIT)))
         tx, ty = world_to_px(phase['target']['x'], phase['target']['y'])
-        draw_sprite(surface, TARGET, tx - 16, ty - 16, scale=2)
+        draw_sprite(surface, TARGET, tx - 8 * target_scale, ty - 8 * target_scale, scale=target_scale)
 
         if show_preview and anim['phase'] == 'idle' and result_msg is None:
             f_prev, _ = compile_expr(input_text[2:])
