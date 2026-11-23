@@ -125,8 +125,9 @@ _BIN_OPS = (ast.Add, ast.Sub, ast.Mult, ast.Div, ast.Pow, ast.Mod)
 _UNARY_OPS = (ast.UAdd, ast.USub)
 _TOKEN_RE = re.compile(r'\d+\.?\d*|\.\d+|abs|exp|sqrt|sin|cos|tan|log|pi|e|x|\*\*|[-+*/%()]|\S')
 
-BG_MUNDO2 = None
+BBG_MUNDO2 = None
 BG_PRATICA = None
+BG_MUNDO3 = {}
 
 # Variáveis globais para a câmera dinâmica
 CAMERA_UNIT = GAME_UNIT
@@ -922,6 +923,8 @@ def play(window, surface, clock, chapter_num):
             pygame.display.flip()
             continue
 
+        
+        draw_mario_bg.fase_atual = phase_idx
         draw_mario_bg(surface, chapter_num)
         for obs in phase['obstacles']: draw_obstacle(surface, obs)
         steve_scale = max(1, int(2 * (CAMERA_UNIT / GAME_UNIT)))
