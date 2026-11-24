@@ -89,7 +89,9 @@ def main():
                     else:
                         chapter = menumod.hit_test(event.pos, SCALE, is_main_menu=False)
                         unlocked = chapter == 1 or (
-                            chapter is not None and (chapter - 1) in save_data['chapters_completed'])
+                            chapter is not None and
+                            (chapter - 1) in save_data['chapters_completed']
+                        )
                         if chapter is not None and unlocked and gamemod.has_phases(chapter):
                             current_chapter = chapter
                             practice_mode = None # GARANTE QUE É NONE

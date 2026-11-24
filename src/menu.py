@@ -119,7 +119,7 @@ def draw_chapter_select(surface, save_data, mouse_pos, scale):
     for i, (x, y, w, h) in enumerate(get_tiles()):
         ch = i + 1
         
-        if ch <= 2:
+        if ch <= 3:
             unlocked = ch == 1 or (ch - 1) in save_data['chapters_completed']
             color = CHAPTER_COLORS[i] if unlocked else tuple(c // 3 for c in CHAPTER_COLORS[i])
             hover = x <= mx <= x + w and y <= my <= y + h
@@ -174,7 +174,7 @@ def hit_test(mouse_pos, scale, is_main_menu=False):
     else:
         for i, (x, y, w, h) in enumerate(get_tiles()):
             if x <= mx <= x + w and y <= my <= y + h:
-                if i + 1 <= 2:
+                if i + 1 <= 3:
                     return i + 1
                 else:
                     return None

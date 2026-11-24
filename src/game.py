@@ -10,6 +10,7 @@ from sprites import STEVE, TARGET, MARIO_GROUND
 from renderer import draw_sprite, draw_text, draw_bow
 from menu import draw_mc_button
 import save as savemod
+from limites import PHASES_LIMITES
 
 
 PHASES = [
@@ -107,6 +108,9 @@ PHASES = [
         'miss_hint': 'A derivada de e^x e e^x. Digite y=exp(x). Em x=2, exp(2) ~ 7.39.'
     },
 ]
+
+PHASES.extend(PHASES_LIMITES)
+
 
 START_TOL = 0.6
 
@@ -1024,16 +1028,40 @@ def play(window, surface, clock, chapter_num):
                 elif len(input_text) + len(clicked_key) <= MAX_EXPR_LEN: input_text += clicked_key
 
         pygame.draw.rect(surface, (0, 0, 0), (0, 0, INTERNAL_W, 40))
-        draw_text(surface, f"Fase {phase['id']} - {phase['tipo']}", 10, 8, 28, (255, 255, 255))
+
+        if chapter_num == 3:
+            draw_text(
+                surface,
+                f"Fase {phase['id']} - {phase['tipo']}",
+                10, 8, 18, (255, 255, 255)
+            )
+        else:
+            draw_text(
+                surface,
+                f"Fase {phase['id']} - {phase['tipo']}",
+                10, 8, 28, (255, 255, 255)
+    )
         draw_text(surface, f"Tentativas: {attempts}/{MAX_ATTEMPTS}", INTERNAL_W - 220, 8, 28, (255, 255, 255))
 
         pygame.draw.rect(surface, (20, 20, 30), (336, 48, 296, 132))
         pygame.draw.rect(surface, (255, 220, 100), (336, 48, 296, 132), 2)
         draw_text(surface, f"Arqueiro: (x={phase['archer']['x']:g}, y={phase['archer']['y']:g})", 344, 54, 18, (255, 255, 255))
         draw_text(surface, f"Alvo:     (x={phase['target']['x']:g}, y={phase['target']['y']:g})", 344, 76, 18, (255, 255, 255))
-        for i, line in enumerate(wrap_lines(phase['goal'], 18, 276)[:3]):
-            draw_text(surface, line, 344, 102 + i * 20, 18, (255, 220, 100))
-
+        if chapter_num == 3:
+            linhas_objetivo = wrap_lines(phase['goal'], 14, 260)[:4]
+            for i, line in enumerate(linhas_objetivo):
+                draw_text(
+                    surface, line,
+                    344, 96 + i * 17,
+                    13, (255, 220, 100)
+                )
+        else:
+            for i, line in enumerate(wrap_lines(phase['goal'], 18, 276)[:3]):
+                draw_text(
+                    surface, line,
+                    344, 102 + i * 20,
+                    18, (255, 220, 100)
+                )
         if result_msg and not show_graph:
             overlay = pygame.Surface((INTERNAL_W, INTERNAL_H))
             overlay.set_alpha(200)
